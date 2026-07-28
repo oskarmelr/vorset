@@ -174,6 +174,22 @@ html,body{background:#111}
         </sc-for>
       </div>
     </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <label style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:2px">…ELLER TA EN SELFIE</label>
+      <sc-if value="{{ noAvatar }}" hint-placeholder-val="{{ true }}">
+      <div style="position:relative;border:3px dashed #111;background:#FBF7EC;padding:13px;text-align:center;font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:1px;box-shadow:4px 4px 0 #111">
+        📸 TA SELFIE
+        <input type="file" accept="image/*" capture="user" sc-camel-on-change="{{ takeSelfie }}" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer">
+      </div>
+      </sc-if>
+      <sc-if value="{{ hasAvatar }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:12px;border:3px solid #111;background:#FBF7EC;padding:10px;box-shadow:4px 4px 0 #111">
+        <img sc-camel-src="{{ avatar }}" alt="selfie" style="width:56px;height:56px;object-fit:cover;border:3px solid #111;transform:rotate(-2deg)">
+        <span style="font-weight:700;font-size:13px">Se der ja. Klar for kveld.</span>
+        <button sc-camel-on-click="{{ clearSelfie }}" style="margin-left:auto;border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:10px;padding:6px 8px;cursor:pointer">FJERN</button>
+      </div>
+      </sc-if>
+    </div>
     <button sc-camel-on-click="{{ join }}" style="margin-top:auto;border:3px solid #111;background:#111;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:20px;padding:16px;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,0.35);letter-spacing:1px">INN MED DEG →</button>
     <div style="font-size:11px;text-align:center;font-weight:500;opacity:0.7">Nummeret brukes bare til å peke deg ut. Dessverre.</div>
   </div>
@@ -206,7 +222,7 @@ html,body{background:#111}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <sc-for list="{{ voteOpts }}" as="p" hint-placeholder-count="6">
           <button sc-camel-on-click="{{ p.pick }}" style="border:3px solid #111;background:{{ p.bg }};color:{{ p.fg }};padding:12px 10px;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:3px 3px 0 #111">
-            <span style="font-size:20px">{{ p.emoji }}</span><span>{{ p.name }}</span>
+            <sc-if value="{{ p.hasImg }}" hint-placeholder-val="{{ false }}"><img sc-camel-src="{{ p.img }}" alt="" style="width:26px;height:26px;object-fit:cover;border:2px solid #111"></sc-if><sc-if value="{{ p.noImg }}" hint-placeholder-val="{{ true }}"><span style="font-size:20px">{{ p.emoji }}</span></sc-if><span>{{ p.name }}</span>
           </button>
         </sc-for>
       </div>
@@ -238,9 +254,9 @@ html,body{background:#111}
     <div style="font-size:12px;font-weight:500;opacity:0.7;margin-bottom:16px">Sistemann spanderer på Rauma Rock i morra.</div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <sc-for list="{{ board }}" as="p" hint-placeholder-count="7">
-        <div style="display:flex;align-items:center;gap:12px;border:3px solid #111;background:{{ p.bg }};color:{{ p.fg }};padding:10px 14px;box-shadow:3px 3px 0 #111">
+        <div style="display:flex;align-items:center;gap:12px;border:3px solid #111;background:{{ p.bg }};color:{{ p.fg }};padding:10px 14px;box-shadow:3px 3px 0 #111;opacity:{{ p.rowOp }}">
           <span style="font-family:'Archivo Black',sans-serif;font-size:15px;width:26px">{{ p.rank }}</span>
-          <span style="font-size:20px">{{ p.emoji }}</span>
+          <sc-if value="{{ p.hasImg }}" hint-placeholder-val="{{ false }}"><img sc-camel-src="{{ p.img }}" alt="" style="width:28px;height:28px;object-fit:cover;border:2px solid #111"></sc-if><sc-if value="{{ p.noImg }}" hint-placeholder-val="{{ true }}"><span style="font-size:20px">{{ p.emoji }}</span></sc-if>
           <span style="font-weight:700;font-size:16px">{{ p.name }}</span>
           <span style="margin-left:auto;font-family:'Archivo Black',sans-serif;font-size:16px">{{ p.pts }}</span>
         </div>
@@ -284,6 +300,7 @@ html,body{background:#111}
   </div>
 
   <sc-if value="{{ isRunder }}" hint-placeholder-val="{{ true }}">
+  <sc-if value="{{ notEditing }}" hint-placeholder-val="{{ true }}">
   <div style="flex:1;overflow:auto;padding:6px 18px 20px;display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;gap:10px">
       <button sc-camel-on-click="{{ nextRound }}" style="flex:1;border:3px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:15px;padding:14px 0;cursor:pointer">NESTE RUNDE →</button>
@@ -295,43 +312,103 @@ html,body{background:#111}
     </div>
     <div style="display:flex;flex-direction:column;gap:6px">
       <sc-for list="{{ adminRounds }}" as="r" hint-placeholder-count="7">
-        <button sc-camel-on-click="{{ r.jump }}" style="display:flex;align-items:center;gap:10px;border:2px solid #F5D40A;background:{{ r.bg }};color:{{ r.fg }};padding:10px 12px;cursor:pointer;text-align:left;font-family:'Space Grotesk',sans-serif">
-          <span style="font-family:'Archivo Black',sans-serif;font-size:13px">{{ r.n }}</span>
-          <span style="font-weight:700;font-size:14px">{{ r.title }}</span>
-          <span style="margin-left:auto;font-size:10px;font-weight:700;opacity:0.7">{{ r.badge }}</span>
-        </button>
+        <div style="display:flex;gap:6px">
+          <button sc-camel-on-click="{{ r.jump }}" style="flex:1;display:flex;align-items:center;gap:10px;border:2px solid #F5D40A;background:{{ r.bg }};color:{{ r.fg }};padding:10px 12px;cursor:pointer;text-align:left;font-family:'Space Grotesk',sans-serif;min-width:0">
+            <span style="font-family:'Archivo Black',sans-serif;font-size:13px">{{ r.n }}</span>
+            <span style="font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.title }}</span>
+            <span style="margin-left:auto;font-size:10px;font-weight:700;opacity:0.7">{{ r.badge }}</span>
+          </button>
+          <button sc-camel-on-click="{{ r.editIt }}" style="flex:none;border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-size:14px;padding:0 12px;cursor:pointer">✏️</button>
+        </div>
       </sc-for>
+      <button sc-camel-on-click="{{ openNewRound }}" style="border:2px dashed #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:12px;padding:12px;cursor:pointer">+ NY LEKE</button>
     </div>
   </div>
   </sc-if>
+  <sc-if value="{{ isEditing }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;overflow:auto;padding:6px 18px 20px;display:flex;flex-direction:column;gap:12px">
+    <div style="font-family:'Archivo Black',sans-serif;font-size:16px">{{ editHeader }}</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <label style="font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:2px;opacity:0.8">TYPE LEKE</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <sc-for list="{{ editTypes }}" as="t" hint-placeholder-count="7">
+          <button sc-camel-on-click="{{ t.pick }}" style="border:2px solid #F5D40A;background:{{ t.bg }};color:{{ t.fg }};font-family:'Archivo Black',sans-serif;font-size:10px;padding:6px 9px;cursor:pointer">{{ t.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <label style="font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:2px;opacity:0.8">TITTEL</label>
+      <input value="{{ editTitle }}" sc-camel-on-change="{{ setEditTitle }}" placeholder="F.EKS. HVEM SOVNER FØRST I TELTET?" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;padding:11px 12px;font-size:15px;font-weight:700;border-radius:0">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <label style="font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:2px;opacity:0.8">TEKST / REGLER</label>
+      <textarea value="{{ editBody }}" sc-camel-on-change="{{ setEditBody }}" rows="3" placeholder="Hva skjer i denne leken? Hvem drikker hvor mye?" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;padding:11px 12px;font-size:14px;font-weight:500;font-family:'Space Grotesk',sans-serif;resize:vertical;border-radius:0"></textarea>
+    </div>
+    <sc-if value="{{ editIsQuiz }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <label style="font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:2px;opacity:0.8">SVARALTERNATIVER — TRYKK ✓ VED RIKTIG SVAR</label>
+      <sc-for list="{{ editOpts }}" as="o" hint-placeholder-count="4">
+        <div style="display:flex;gap:6px">
+          <input value="{{ o.v }}" sc-camel-on-change="{{ o.set }}" placeholder="Svaralternativ" style="flex:1;border:2px solid #F5D40A;background:transparent;color:#F5D40A;padding:9px 10px;font-size:14px;font-weight:700;border-radius:0;min-width:0">
+          <button sc-camel-on-click="{{ o.mark }}" style="flex:none;border:2px solid #F5D40A;background:{{ o.bg }};color:{{ o.fg }};font-family:'Archivo Black',sans-serif;font-size:13px;padding:0 14px;cursor:pointer">✓</button>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+    <button sc-camel-on-click="{{ saveEdit }}" style="border:3px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:14px;padding:13px;cursor:pointer">LAGRE LEKEN ✔</button>
+    <div style="display:flex;gap:8px">
+      <button sc-camel-on-click="{{ cancelEdit }}" style="flex:1;border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:11px;padding:10px;cursor:pointer">AVBRYT</button>
+      <sc-if value="{{ canDelete }}" hint-placeholder-val="{{ false }}">
+        <button sc-camel-on-click="{{ deleteEdit }}" style="flex:1;border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:11px;padding:10px;cursor:pointer">SLETT LEKEN 🗑</button>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+  </sc-if>
 
   <sc-if value="{{ isOppgaver }}" hint-placeholder-val="{{ false }}">
+  <sc-if value="{{ notTaskEditing }}" hint-placeholder-val="{{ true }}">
   <div style="flex:1;overflow:auto;padding:6px 18px 20px;display:flex;flex-direction:column;gap:10px">
     <div style="font-size:12px;font-weight:500;opacity:0.7">Hemmelige oppgaver — bare dere ser hvem som har hva.</div>
     <sc-for list="{{ adminTasks }}" as="t" hint-placeholder-count="3">
       <div style="border:2px solid #F5D40A;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
         <div style="font-size:14px;font-weight:500;line-height:1.4">{{ t.t }}</div>
-        <div style="display:flex;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <span style="font-size:12px;font-weight:700;color:#E33B2E">{{ t.who }}</span>
-          <sc-if value="{{ t.canSend }}" hint-placeholder-val="{{ false }}">
-            <button sc-camel-on-click="{{ t.send }}" style="margin-left:auto;border:2px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:10px;padding:6px 10px;cursor:pointer">SEND TIL RANDOM (demo: deg)</button>
-          </sc-if>
+          <span style="margin-left:auto;display:flex;gap:6px">
+            <sc-if value="{{ t.canSend }}" hint-placeholder-val="{{ false }}">
+              <button sc-camel-on-click="{{ t.send }}" style="border:2px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:10px;padding:6px 10px;cursor:pointer">SEND (demo: deg)</button>
+            </sc-if>
+            <button sc-camel-on-click="{{ t.editIt }}" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-size:12px;padding:6px 9px;cursor:pointer">✏️</button>
+            <button sc-camel-on-click="{{ t.del }}" style="border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:10px;padding:6px 9px;cursor:pointer">SLETT</button>
+          </span>
         </div>
       </div>
     </sc-for>
-    <button sc-camel-on-click="{{ newTask }}" style="border:2px dashed #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:12px;padding:12px;cursor:pointer">+ NY OPPGAVE</button>
+    <button sc-camel-on-click="{{ openNewTask }}" style="border:2px dashed #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:12px;padding:12px;cursor:pointer">+ NY OPPGAVE</button>
   </div>
+  </sc-if>
+  <sc-if value="{{ isTaskEditing }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;overflow:auto;padding:6px 18px 20px;display:flex;flex-direction:column;gap:12px">
+    <div style="font-family:'Archivo Black',sans-serif;font-size:16px">{{ taskHeader }}</div>
+    <textarea value="{{ taskText }}" sc-camel-on-change="{{ setTaskText }}" rows="4" placeholder="F.eks: Få tre stykker til å skåle med deg uten å si hvorfor…" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;padding:11px 12px;font-size:14px;font-weight:500;font-family:'Space Grotesk',sans-serif;resize:vertical;border-radius:0"></textarea>
+    <button sc-camel-on-click="{{ saveTask }}" style="border:3px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:14px;padding:13px;cursor:pointer">LAGRE OPPGAVEN ✔</button>
+    <button sc-camel-on-click="{{ cancelTask }}" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:11px;padding:10px;cursor:pointer">AVBRYT</button>
+  </div>
+  </sc-if>
   </sc-if>
 
   <sc-if value="{{ isFolk }}" hint-placeholder-val="{{ false }}">
   <div style="flex:1;overflow:auto;padding:6px 18px 20px;display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:12px;font-weight:500;opacity:0.7">BENK = er med i rommet, men slipper alle leker.</div>
     <sc-for list="{{ adminFolk }}" as="p" hint-placeholder-count="7">
-      <div style="display:flex;align-items:center;gap:10px;border:2px solid #F5D40A;padding:9px 12px">
-        <span style="font-size:18px">{{ p.emoji }}</span>
-        <span style="font-weight:700;font-size:14px">{{ p.name }}</span>
+      <div style="display:flex;align-items:center;gap:8px;border:2px solid #F5D40A;padding:9px 10px;opacity:{{ p.rowOp }}">
+        <sc-if value="{{ p.hasImg }}" hint-placeholder-val="{{ false }}"><img sc-camel-src="{{ p.img }}" alt="" style="width:24px;height:24px;object-fit:cover;border:2px solid #F5D40A"></sc-if><sc-if value="{{ p.noImg }}" hint-placeholder-val="{{ true }}"><span style="font-size:18px">{{ p.emoji }}</span></sc-if>
+        <span style="font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">{{ p.name }}</span>
         <span style="font-size:11px;opacity:0.6">{{ p.pts }}p</span>
-        <button sc-camel-on-click="{{ p.sip }}" style="margin-left:auto;border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:10px;padding:5px 8px;cursor:pointer">+3 🍺</button>
-        <button sc-camel-on-click="{{ p.kick }}" style="border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:10px;padding:5px 8px;cursor:pointer">KICK</button>
+        <button sc-camel-on-click="{{ p.sip }}" style="margin-left:auto;border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:10px;padding:5px 7px;cursor:pointer">+3 🍺</button>
+        <button sc-camel-on-click="{{ p.bench }}" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:10px;padding:5px 7px;cursor:pointer">{{ p.benchLabel }}</button>
+        <button sc-camel-on-click="{{ p.kick }}" style="border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:10px;padding:5px 7px;cursor:pointer">KICK</button>
       </div>
     </sc-for>
   </div>
@@ -389,34 +466,37 @@ html,body{background:#111}
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;adminPin&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;7067&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Admin&quot;},&quot;demoSecretDelay&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:0,&quot;max&quot;:60,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
 class Component extends DCLogic {
   state = {
-    screen: 'onboard', phone: '', name: '', emoji: '🍺',
+    screen: 'onboard', phone: '', name: '', emoji: '🍺', avatar: null,
     tab: 'kveld', roundIdx: 0, voted: null, quizPick: null,
     secretOpen: false, secretTask: null,
     adminOpen: false, pin: '', isAdmin: false, adminTab: 'runder',
     interval: 15, toast: null,
+    editIdx: null, edit: null,
+    taskEditIdx: null, taskText: '',
     players: [
-      {name: 'jørgen', emoji: '🤠', pts: 140},
-      {name: 'mia', emoji: '🦍', pts: 120},
-      {name: 'sander', emoji: '🍕', pts: 95},
-      {name: 'ida', emoji: '👹', pts: 90},
-      {name: 'thea', emoji: '🐍', pts: 60},
-      {name: 'even', emoji: '🤡', pts: 40}
+      {name: 'jørgen', emoji: '🤠', pts: 140, benched: false},
+      {name: 'mia', emoji: '🦍', pts: 120, benched: false},
+      {name: 'sander', emoji: '🍕', pts: 95, benched: false},
+      {name: 'ida', emoji: '👹', pts: 90, benched: false},
+      {name: 'thea', emoji: '🐍', pts: 60, benched: false},
+      {name: 'even', emoji: '🤡', pts: 40, benched: false}
     ],
     tasks: [
       {t: 'Få noen til å si «Rauma Rock» høyt uten å spørre direkte. Klarer du det → del ut 6 slurker.', who: null},
       {t: 'Snik ordet «campingstol» inn i tre ulike samtaler uten at noen reagerer.', who: null},
       {t: 'Bytt drikke med noen uten at de merker det før neste runde.', who: null}
+    ],
+    rounds: [
+      {type: 'regel', title: 'NY REGEL I HUSET', body: 'Fra nå: forbudt å si ordet «drikke». 2 slurker per glipp. Gjelder til neste regel-runde.'},
+      {type: 'pekelek', title: 'HVEM HER HADDE OVERLEVD KORTEST I FENGSEL?', body: 'Alle peker på tre. Den med flest pekefingre drikker 4.'},
+      {type: 'quiz', title: 'HVILKET ÅR VAR FØRSTE RAUMA ROCK?', body: 'Feil svar = 3 slurker. Riktig = del ut 3.', opts: ['1998', '2003', '2007', '2012'], right: 1},
+      {type: 'duell', title: 'STIRREKONKURRANSE', body: 'Første som blunker eller ler drikker 5. Resten heier.'},
+      {type: 'kategori', title: 'KATEGORI: NORSKE FESTIVALER', body: 'Etter tur med klokka. Nøler du over 5 sek eller gjentar — drikk 4.'},
+      {type: 'hemmelig', title: 'HEMMELIGE OPPGAVER ER UTE', body: 'Noen i rommet har akkurat fått et oppdrag på mobilen. Stol ikke på noen.'},
+      {type: 'bunnefest', title: 'BUNNEFEST 🌊', body: 'Alle reiser seg. Yngstemann starter — du kan ikke stoppe før personen til venstre for deg stopper.'}
     ]
   };
-  ROUNDS = [
-    {type: 'regel', title: 'NY REGEL I HUSET', body: 'Fra nå: forbudt å si ordet «drikke». 2 slurker per glipp. Gjelder til neste regel-runde.'},
-    {type: 'pekelek', title: 'HVEM HER HADDE OVERLEVD KORTEST I FENGSEL?', body: 'Alle peker på tre. Den med flest pekefingre drikker 4.'},
-    {type: 'quiz', title: 'HVILKET ÅR VAR FØRSTE RAUMA ROCK?', body: 'Feil svar = 3 slurker. Riktig = del ut 3.', opts: ['1998', '2003', '2007', '2012'], right: 1},
-    {type: 'duell', title: 'STIRREKONKURRANSE', body: 'Første som blunker eller ler drikker 5. Resten heier.'},
-    {type: 'kategori', title: 'KATEGORI: NORSKE FESTIVALER', body: 'Etter tur med klokka. Nøler du over 5 sek eller gjentar — drikk 4.'},
-    {type: 'hemmelig', title: 'HEMMELIGE OPPGAVER ER UTE', body: 'Noen i rommet har akkurat fått et oppdrag på mobilen. Stol ikke på noen.'},
-    {type: 'bunnefest', title: 'BUNNEFEST 🌊', body: 'Alle reiser seg. Yngstemann starter — du kan ikke stoppe før personen til venstre for deg stopper.'}
-  ];
+  TYPES = ['regel', 'pekelek', 'quiz', 'duell', 'kategori', 'hemmelig', 'bunnefest'];
   EMOJIS = ['🍺', '🤠', '🦍', '👹', '🐍', '🤡', '🔥', '🍕', '😈', '🎸', '🪩', '🥴'];
   showToast(msg) {
     clearTimeout(this._tt);
@@ -428,22 +508,40 @@ class Component extends DCLogic {
   }
   componentWillUnmount() { clearTimeout(this._tt); clearTimeout(this._st); }
   renderVals() {
-    const s = this.state, R = this.ROUNDS, r = R[s.roundIdx];
-    const Y = '#F5D40A', K = '#111', W = '#FBF7EC';
+    const s = this.state, R = s.rounds, r = R[s.roundIdx] || R[0];
+    const Y = '#F5D40A', K = '#111', W = '#FBF7EC', RED = '#E33B2E';
     const join = () => {
       const name = (s.name || 'deg').trim().toLowerCase();
-      this.setState({screen: 'app', players: [...s.players, {name, emoji: s.emoji, pts: 0, you: true}]});
+      this.setState({screen: 'app', players: [...s.players, {name, emoji: s.emoji, img: s.avatar, pts: 0, you: true, benched: false}]});
       const delay = (this.props.demoSecretDelay ?? 8) * 1000;
       this._st = setTimeout(() => {
         this.setState(st => ({secretOpen: true, secretTask: st.tasks[0].t, tasks: st.tasks.map((t, i) => i === 0 ? {...t, who: name + ' (deg)'} : t)}));
       }, delay);
+    };
+    const takeSelfie = e => {
+      const f = e.target && e.target.files && e.target.files[0];
+      if (!f) return;
+      const url = URL.createObjectURL(f);
+      const img = new Image();
+      img.onload = () => {
+        const S = 128, c = document.createElement('canvas');
+        c.width = c.height = S;
+        const ctx = c.getContext('2d');
+        const m = Math.min(img.width, img.height);
+        ctx.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, S, S);
+        URL.revokeObjectURL(url);
+        this.setState({avatar: c.toDataURL('image/jpeg', 0.82)});
+        this.showToast('SE DER JA. FJESET ER LAGRA 📸');
+      };
+      img.src = url;
     };
     const nextRound = () => {
       const idx = (s.roundIdx + 1) % R.length;
       this.setState({roundIdx: idx, voted: null, quizPick: null});
       this.showToast('RUNDE ' + (idx + 1) + ' I GANG →');
     };
-    const others = s.players.filter(p => !p.you);
+    const activePlayers = s.players.filter(p => !p.benched);
+    const others = activePlayers.filter(p => !p.you);
     const pinTarget = String(this.props.adminPin ?? '7067');
     const press = (d) => {
       if (d === '⌫') return this.setState({pin: s.pin.slice(0, -1)});
@@ -454,12 +552,17 @@ class Component extends DCLogic {
         else { this.setState({pin: ''}); this.showToast('FEIL PIN, PRØV IGJEN 🚫'); }
       } else this.setState({pin});
     };
+    const ed = s.edit || {type: 'regel', title: '', body: '', opts: ['', '', '', ''], right: 0};
+    const setEd = (patch) => this.setState(st => ({edit: {...st.edit, ...patch}}));
+    const ruleRounds = R.slice(0, s.roundIdx + 1).filter(x => x.type === 'regel');
     return {
       isOnboard: s.screen === 'onboard', isApp: s.screen === 'app',
       phone: s.phone, name: s.name,
       setPhone: e => this.setState({phone: e.target.value}),
       setName: e => this.setState({name: e.target.value}),
       emojis: this.EMOJIS.map(e => ({e, bg: s.emoji === e ? Y : W, pick: () => this.setState({emoji: e})})),
+      hasAvatar: !!s.avatar, noAvatar: !s.avatar, avatar: s.avatar,
+      takeSelfie, clearSelfie: () => this.setState({avatar: null}),
       join,
       tabLabel: s.tab, isKveld: s.tab === 'kveld', isPoeng: s.tab === 'poeng',
       goKveld: () => this.setState({tab: 'kveld'}),
@@ -468,11 +571,11 @@ class Component extends DCLogic {
       poengBg: s.tab === 'poeng' ? Y : 'transparent', poengFg: s.tab === 'poeng' ? K : Y,
       roundLabel: 'RUNDE ' + (s.roundIdx + 1) + '/' + R.length,
       roundBadge: r.type.toUpperCase(), roundTitle: r.title, roundBody: r.body,
-      activeRule: 'Forbudt å si «drikke» — 2 slurker per glipp',
+      activeRule: ruleRounds.length ? ruleRounds[ruleRounds.length - 1].body : 'Ingen aktiv regel — enn så lenge.',
       isPekelek: r.type === 'pekelek', isQuiz: r.type === 'quiz', isDuell: r.type === 'duell',
-      duelA: (others[0] || {}).name, duelB: (others[2] || {}).name,
-      voteOpts: s.players.map((p, i) => ({
-        name: p.name, emoji: p.emoji,
+      duelA: (others[0] || {name: '?'}).name, duelB: (others.length > 1 ? others[others.length - 1] : {name: '?'}).name,
+      voteOpts: s.players.map((p, i) => ({p, i})).filter(x => !x.p.benched).map(({p, i}) => ({
+        name: p.name, emoji: p.emoji, img: p.img || null, hasImg: !!p.img, noImg: !p.img,
         bg: s.voted === i ? K : W, fg: s.voted === i ? Y : K,
         pick: () => {
           if (s.voted != null) return;
@@ -484,7 +587,7 @@ class Component extends DCLogic {
         let bg = W, fg = K;
         if (s.quizPick != null) {
           if (i === r.right) { bg = K; fg = Y; }
-          else if (i === s.quizPick) { bg = '#E33B2E'; fg = '#fff'; }
+          else if (i === s.quizPick) { bg = RED; fg = '#fff'; }
         }
         return {label: o, bg, fg, pick: () => {
           if (s.quizPick != null) return;
@@ -494,12 +597,14 @@ class Component extends DCLogic {
         }};
       }),
       board: [...s.players].sort((a, b) => b.pts - a.pts).map((p, i) => ({
-        rank: '#' + (i + 1), name: p.you ? p.name + ' (deg)' : p.name, emoji: p.emoji, pts: p.pts,
-        bg: p.you ? K : W, fg: p.you ? Y : K
+        rank: '#' + (i + 1),
+        name: (p.you ? p.name + ' (deg)' : p.name) + (p.benched ? ' · BENKA 🪑' : ''),
+        emoji: p.emoji, img: p.img || null, hasImg: !!p.img, noImg: !p.img, pts: p.pts,
+        bg: p.you ? K : W, fg: p.you ? Y : K, rowOp: p.benched ? 0.45 : 1
       })),
       adminOpen: s.adminOpen, needsPin: !s.isAdmin, isAdmin: s.isAdmin,
       openAdmin: () => this.setState({adminOpen: true}),
-      closeAdmin: () => this.setState({adminOpen: false, pin: ''}),
+      closeAdmin: () => this.setState({adminOpen: false, pin: '', edit: null, editIdx: null, taskEditIdx: null}),
       pinDots: ('●'.repeat(s.pin.length) + '○'.repeat(4 - s.pin.length)).split('').join(' '),
       pinBtns: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map(d => ({label: d, op: d ? 1 : 0, press: () => press(d)})),
       isRunder: s.adminTab === 'runder', isOppgaver: s.adminTab === 'oppgaver', isFolk: s.adminTab === 'folk',
@@ -515,18 +620,73 @@ class Component extends DCLogic {
       adminRounds: R.map((x, i) => ({
         n: (i + 1 < 10 ? '0' : '') + (i + 1), title: x.title, badge: x.type.toUpperCase(),
         bg: i === s.roundIdx ? Y : 'transparent', fg: i === s.roundIdx ? K : Y,
-        jump: () => { this.setState({roundIdx: i, voted: null, quizPick: null, adminOpen: false}); this.showToast('HOPPET TIL RUNDE ' + (i + 1)); }
+        jump: () => { this.setState({roundIdx: i, voted: null, quizPick: null, adminOpen: false}); this.showToast('HOPPET TIL RUNDE ' + (i + 1)); },
+        editIt: () => this.setState({editIdx: i, edit: {type: x.type, title: x.title, body: x.body, opts: x.opts ? [...x.opts] : ['', '', '', ''], right: x.right ?? 0}})
       })),
+      notEditing: s.edit == null, isEditing: s.edit != null,
+      editHeader: s.editIdx === -1 ? 'NY LEKE ✍️' : 'ENDRE LEKE ' + (s.editIdx + 1),
+      editTitle: ed.title, editBody: ed.body,
+      setEditTitle: e => setEd({title: e.target.value}),
+      setEditBody: e => setEd({body: e.target.value}),
+      editTypes: this.TYPES.map(t => ({
+        label: t.toUpperCase(), bg: ed.type === t ? Y : 'transparent', fg: ed.type === t ? K : Y,
+        pick: () => setEd({type: t})
+      })),
+      editIsQuiz: ed.type === 'quiz',
+      editOpts: (ed.opts || []).map((o, i) => ({
+        v: o, bg: ed.right === i ? Y : 'transparent', fg: ed.right === i ? K : Y,
+        set: e => { const v = e.target.value; this.setState(st => ({edit: {...st.edit, opts: st.edit.opts.map((q, j) => j === i ? v : q)}})); },
+        mark: () => setEd({right: i})
+      })),
+      openNewRound: () => this.setState({editIdx: -1, edit: {type: 'regel', title: '', body: '', opts: ['', '', '', ''], right: 0}}),
+      saveEdit: () => {
+        const e2 = s.edit; if (!e2) return;
+        const nr = {type: e2.type, title: (e2.title || 'UTEN TITTEL').toUpperCase(), body: e2.body || ''};
+        if (e2.type === 'quiz') { nr.opts = e2.opts.map(o => o || '?'); nr.right = e2.right ?? 0; }
+        const rounds = s.editIdx === -1 ? [...R, nr] : R.map((q, j) => j === s.editIdx ? nr : q);
+        this.setState({rounds, edit: null, editIdx: null});
+        this.showToast(s.editIdx === -1 ? 'LEKE LAGT TIL ✔' : 'LEKE OPPDATERT ✔');
+      },
+      deleteEdit: () => {
+        if (s.editIdx == null || s.editIdx < 0 || R.length <= 1) return;
+        const rounds = R.filter((_, j) => j !== s.editIdx);
+        let idx = s.roundIdx;
+        if (idx >= s.editIdx) idx = Math.max(0, idx - 1);
+        this.setState({rounds, roundIdx: idx, edit: null, editIdx: null, voted: null, quizPick: null});
+        this.showToast('LEKEN ER SLETTA 🗑');
+      },
+      cancelEdit: () => this.setState({edit: null, editIdx: null}),
+      canDelete: s.editIdx != null && s.editIdx >= 0 && R.length > 1,
       adminTasks: s.tasks.map((t, i) => ({
         t: t.t, who: t.who ? '→ hos ' + t.who : '→ ikke delt ut ennå', canSend: !t.who,
         send: () => {
           this.setState({tasks: s.tasks.map((q, j) => j === i ? {...q, who: 'deg (demo)'} : q), secretOpen: true, secretTask: t.t, adminOpen: false});
-        }
+        },
+        editIt: () => this.setState({taskEditIdx: i, taskText: t.t}),
+        del: () => { this.setState({tasks: s.tasks.filter((_, j) => j !== i)}); this.showToast('OPPGAVE SLETTA 🗑'); }
       })),
-      newTask: () => this.showToast('OPPGAVE-EDITOR KOMMER I NESTE UTKAST ✍️'),
+      notTaskEditing: s.taskEditIdx == null, isTaskEditing: s.taskEditIdx != null,
+      taskHeader: s.taskEditIdx === -1 ? 'NY HEMMELIG OPPGAVE ✍️' : 'ENDRE OPPGAVE',
+      taskText: s.taskText,
+      setTaskText: e => this.setState({taskText: e.target.value}),
+      openNewTask: () => this.setState({taskEditIdx: -1, taskText: ''}),
+      saveTask: () => {
+        const txt = (s.taskText || '').trim();
+        if (!txt) { this.showToast('SKRIV EN OPPGAVE FØRST ✍️'); return; }
+        const tasks = s.taskEditIdx === -1 ? [...s.tasks, {t: txt, who: null}] : s.tasks.map((q, j) => j === s.taskEditIdx ? {...q, t: txt} : q);
+        this.setState({tasks, taskEditIdx: null, taskText: ''});
+        this.showToast(s.taskEditIdx === -1 ? 'OPPGAVE LAGT TIL ✔' : 'OPPGAVE OPPDATERT ✔');
+      },
+      cancelTask: () => this.setState({taskEditIdx: null, taskText: ''}),
       adminFolk: s.players.map((p, i) => ({
-        name: p.you ? p.name + ' (deg)' : p.name, emoji: p.emoji, pts: p.pts,
+        name: p.you ? p.name + ' (deg)' : p.name, emoji: p.emoji, img: p.img || null,
+        hasImg: !!p.img, noImg: !p.img, pts: p.pts, rowOp: p.benched ? 0.5 : 1,
+        benchLabel: p.benched ? 'INN 🎉' : 'BENK 🪑',
         sip: () => this.showToast(p.name.toUpperCase() + ' MÅ DRIKKE 3 🍻'),
+        bench: () => {
+          this.setState({players: s.players.map((q, j) => j === i ? {...q, benched: !q.benched} : q)});
+          this.showToast(p.benched ? p.name.toUpperCase() + ' ER MED IGJEN 🎉' : p.name.toUpperCase() + ' ER BENKA — INGEN LEKER 🪑');
+        },
         kick: () => { this.setState({players: s.players.filter((_, j) => j !== i)}); this.showToast(p.name.toUpperCase() + ' ER KASTA UT 👋'); }
       })),
       secretOpen: s.secretOpen, secretTask: s.secretTask,
