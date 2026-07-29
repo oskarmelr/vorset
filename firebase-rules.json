@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "rooms": {
+      "$rom": {
+        ".read": true,
+        ".write": true
+      }
+    }
+  }
+}
