@@ -12,6 +12,21 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
 <script src="dc-runtime.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, update, get, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+const app = initializeApp({
+  apiKey: "AIzaSyDvYYQjsuOHHQGXN0h6uStynOehqH5X7BE",
+  authDomain: "vorset-9010e.firebaseapp.com",
+  databaseURL: "https://vorset-9010e-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "vorset-9010e",
+  storageBucket: "vorset-9010e.firebasestorage.app",
+  messagingSenderId: "1072229449847",
+  appId: "1:1072229449847:web:89b26fa6737fe4e44e0672"
+});
+window.VDB = { db: getDatabase(app), ref, set, update, get, remove, onValue, runTransaction };
+window.dispatchEvent(new Event("vdb-ready"));
+</script>
 </head>
 <body>
 <x-dc>
@@ -159,8 +174,8 @@ html,body{background:#111}
   </div>
   <div style="flex:1;padding:30px 22px 24px;display:flex;flex-direction:column;gap:14px;overflow:auto">
     <div style="display:flex;flex-direction:column;gap:6px">
-      <label style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:2px">MOBILNUMMER</label>
-      <input value="{{ phone }}" sc-camel-on-change="{{ setPhone }}" placeholder="+47 …" sc-camel-input-mode="tel" style="border:3px solid #111;background:#FBF7EC;padding:13px 14px;font-size:17px;font-weight:700;border-radius:0;box-shadow:4px 4px 0 #111">
+      <label style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:2px">ROMKODE</label>
+      <input value="{{ code }}" sc-camel-on-change="{{ setCode }}" placeholder="F.EKS. K7M2" maxlength="4" sc-camel-auto-capitalize="characters" sc-camel-auto-correct="off" style="border:3px solid #111;background:#FBF7EC;padding:13px 14px;font-size:22px;font-weight:700;letter-spacing:6px;text-transform:uppercase;font-family:'Archivo Black',sans-serif;border-radius:0;box-shadow:4px 4px 0 #111">
     </div>
     <div style="display:flex;flex-direction:column;gap:6px">
       <label style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:2px">BRUKERNAVN</label>
@@ -190,8 +205,9 @@ html,body{background:#111}
       </div>
       </sc-if>
     </div>
-    <button sc-camel-on-click="{{ join }}" style="margin-top:auto;border:3px solid #111;background:#111;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:20px;padding:16px;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,0.35);letter-spacing:1px">INN MED DEG →</button>
-    <div style="font-size:11px;text-align:center;font-weight:500;opacity:0.7">Nummeret brukes bare til å peke deg ut. Dessverre.</div>
+    <button sc-camel-on-click="{{ join }}" style="margin-top:auto;border:3px solid #111;background:#111;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:19px;padding:16px;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,0.35);letter-spacing:1px">{{ joinLabel }}</button>
+    <button sc-camel-on-click="{{ newRoom }}" style="border:3px solid #111;background:transparent;color:#111;font-family:'Archivo Black',sans-serif;font-size:13px;padding:12px;cursor:pointer;letter-spacing:1px">+ LAG NYTT VORS (jeg er sjefen)</button>
+    <div style="font-size:11px;text-align:center;font-weight:500;opacity:0.7">Alle taster samme romkode. Sjefen lager rommet først.</div>
   </div>
 </div>
 </sc-if>
@@ -199,8 +215,9 @@ html,body{background:#111}
 <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="Kvelden" style="height:100%;display:flex;flex-direction:column">
   <div style="flex:none;background:#111;color:#F5D40A;padding:12px 18px;display:flex;align-items:center;gap:10px">
-    <div style="font-family:'Archivo Black',sans-serif;font-size:20px">VORSET<span style="color:#fff">.</span></div>
-    <div style="margin-left:auto;font-family:'Archivo Black',sans-serif;font-size:12px;background:#F5D40A;color:#111;padding:4px 8px;transform:rotate(-2deg)">{{ roundLabel }}</div>
+    <div style="font-family:'Archivo Black',sans-serif;font-size:19px">VORSET<span style="color:#fff">.</span></div>
+    <div style="font-family:'Archivo Black',sans-serif;font-size:11px;border:2px solid #F5D40A;padding:3px 6px;letter-spacing:2px">{{ roomCode }}</div>
+    <div style="margin-left:auto;font-family:'Archivo Black',sans-serif;font-size:11px;background:#F5D40A;color:#111;padding:4px 7px;transform:rotate(-2deg)">{{ roundLabel }}</div>
   </div>
   <div style="flex:none;background:#E33B2E;color:#fff;padding:7px 18px;font-size:12px;font-weight:700;display:flex;gap:8px;align-items:center">
     <span style="font-family:'Archivo Black',sans-serif;font-size:10px;background:#fff;color:#E33B2E;padding:2px 5px">REGEL</span>
@@ -222,7 +239,7 @@ html,body{background:#111}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <sc-for list="{{ voteOpts }}" as="p" hint-placeholder-count="6">
           <button sc-camel-on-click="{{ p.pick }}" style="border:3px solid #111;background:{{ p.bg }};color:{{ p.fg }};padding:12px 10px;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:3px 3px 0 #111">
-            <sc-if value="{{ p.hasImg }}" hint-placeholder-val="{{ false }}"><img sc-camel-src="{{ p.img }}" alt="" style="width:26px;height:26px;object-fit:cover;border:2px solid #111"></sc-if><sc-if value="{{ p.noImg }}" hint-placeholder-val="{{ true }}"><span style="font-size:20px">{{ p.emoji }}</span></sc-if><span>{{ p.name }}</span>
+            <sc-if value="{{ p.hasImg }}" hint-placeholder-val="{{ false }}"><img sc-camel-src="{{ p.img }}" alt="" style="width:26px;height:26px;object-fit:cover;border:2px solid #111"></sc-if><sc-if value="{{ p.noImg }}" hint-placeholder-val="{{ true }}"><span style="font-size:20px">{{ p.emoji }}</span></sc-if><span>{{ p.name }}</span><span style="margin-left:auto;font-family:'Archivo Black',sans-serif;font-size:13px">{{ p.tally }}</span>
           </button>
         </sc-for>
       </div>
@@ -251,7 +268,7 @@ html,body{background:#111}
   <sc-if value="{{ isPoeng }}" hint-placeholder-val="{{ false }}">
   <div data-screen-label="Leaderboard" style="flex:1;overflow:auto;padding:22px 18px">
     <div style="font-family:'Archivo Black',sans-serif;font-size:26px">KVELDENS HELTER</div>
-    <div style="font-size:12px;font-weight:500;opacity:0.7;margin-bottom:16px">Sistemann spanderer på Rauma Rock i morra.</div>
+    <div style="font-size:12px;font-weight:500;opacity:0.7;margin-bottom:16px">{{ playerCount }} i rom {{ roomCode }} · sistemann spanderer i morra.</div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <sc-for list="{{ board }}" as="p" hint-placeholder-count="7">
         <div style="display:flex;align-items:center;gap:12px;border:3px solid #111;background:{{ p.bg }};color:{{ p.fg }};padding:10px 14px;box-shadow:3px 3px 0 #111;opacity:{{ p.rowOp }}">
@@ -277,6 +294,7 @@ html,body{background:#111}
 <div data-screen-label="Admin" style="position:absolute;inset:0;background:#111;color:#F5D40A;display:flex;flex-direction:column;animation:sheet 0.25s ease-out">
   <div style="flex:none;padding:16px 18px;display:flex;align-items:center;gap:10px;border-bottom:2px solid rgba(245,212,10,0.25)">
     <div style="font-family:'Archivo Black',sans-serif;font-size:18px">ADMIN<span style="color:#E33B2E">.</span></div>
+    <div style="font-family:'Archivo Black',sans-serif;font-size:12px;border:2px solid #F5D40A;padding:3px 7px;letter-spacing:2px">{{ roomCode }}</div>
     <button sc-camel-on-click="{{ closeAdmin }}" style="margin-left:auto;border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:12px;padding:6px 12px;cursor:pointer">LUKK ✕</button>
   </div>
 
@@ -465,85 +483,150 @@ html,body{background:#111}
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;adminPin&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;7067&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Admin&quot;},&quot;demoSecretDelay&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:0,&quot;max&quot;:60,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
 class Component extends DCLogic {
-  state = {
-    screen: 'onboard', phone: '', name: '', emoji: '🍺', avatar: null,
-    tab: 'kveld', roundIdx: 0, voted: null, quizPick: null,
-    secretOpen: false, secretTask: null,
-    adminOpen: false, pin: '', isAdmin: false, adminTab: 'runder',
-    interval: 15, toast: null,
-    editIdx: null, edit: null,
-    taskEditIdx: null, taskText: '',
-    players: [
-      {name: 'jørgen', emoji: '🤠', pts: 140, benched: false},
-      {name: 'mia', emoji: '🦍', pts: 120, benched: false},
-      {name: 'sander', emoji: '🍕', pts: 95, benched: false},
-      {name: 'ida', emoji: '👹', pts: 90, benched: false},
-      {name: 'thea', emoji: '🐍', pts: 60, benched: false},
-      {name: 'even', emoji: '🤡', pts: 40, benched: false}
-    ],
-    tasks: [
-      {t: 'Få noen til å si «Rauma Rock» høyt uten å spørre direkte. Klarer du det → del ut 6 slurker.', who: null},
-      {t: 'Snik ordet «campingstol» inn i tre ulike samtaler uten at noen reagerer.', who: null},
-      {t: 'Bytt drikke med noen uten at de merker det før neste runde.', who: null}
-    ],
-    rounds: [
-      {type: 'regel', title: 'NY REGEL I HUSET', body: 'Fra nå: forbudt å si ordet «drikke». 2 slurker per glipp. Gjelder til neste regel-runde.'},
-      {type: 'pekelek', title: 'HVEM HER HADDE OVERLEVD KORTEST I FENGSEL?', body: 'Alle peker på tre. Den med flest pekefingre drikker 4.'},
-      {type: 'quiz', title: 'HVILKET ÅR VAR FØRSTE RAUMA ROCK?', body: 'Feil svar = 3 slurker. Riktig = del ut 3.', opts: ['1998', '2003', '2007', '2012'], right: 1},
-      {type: 'duell', title: 'STIRREKONKURRANSE', body: 'Første som blunker eller ler drikker 5. Resten heier.'},
-      {type: 'kategori', title: 'KATEGORI: NORSKE FESTIVALER', body: 'Etter tur med klokka. Nøler du over 5 sek eller gjentar — drikk 4.'},
-      {type: 'hemmelig', title: 'HEMMELIGE OPPGAVER ER UTE', body: 'Noen i rommet har akkurat fått et oppdrag på mobilen. Stol ikke på noen.'},
-      {type: 'bunnefest', title: 'BUNNEFEST 🌊', body: 'Alle reiser seg. Yngstemann starter — du kan ikke stoppe før personen til venstre for deg stopper.'}
-    ]
-  };
+  DEFAULT_ROUNDS = [
+    {type: 'regel', title: 'NY REGEL I HUSET', body: 'Fra nå: forbudt å si ordet «drikke». 2 slurker per glipp. Gjelder til neste regel-runde.'},
+    {type: 'pekelek', title: 'HVEM HER HADDE OVERLEVD KORTEST I FENGSEL?', body: 'Alle peker på tre. Den med flest pekefingre drikker 4.'},
+    {type: 'quiz', title: 'HVILKET ÅR VAR FØRSTE RAUMA ROCK?', body: 'Feil svar = 3 slurker. Riktig = del ut 3.', opts: ['1998', '2003', '2007', '2012'], right: 1},
+    {type: 'duell', title: 'STIRREKONKURRANSE', body: 'Første som blunker eller ler drikker 5. Resten heier.'},
+    {type: 'kategori', title: 'KATEGORI: NORSKE FESTIVALER', body: 'Etter tur med klokka. Nøler du over 5 sek eller gjentar — drikk 4.'},
+    {type: 'hemmelig', title: 'HEMMELIGE OPPGAVER ER UTE', body: 'Noen i rommet har akkurat fått et oppdrag på mobilen. Stol ikke på noen.'},
+    {type: 'bunnefest', title: 'BUNNEFEST 🌊', body: 'Alle reiser seg. Yngstemann starter — du kan ikke stoppe før personen til venstre for deg stopper.'}
+  ];
+  DEFAULT_TASKS = [
+    {t: 'Få noen til å si «Rauma Rock» høyt uten å spørre direkte. Klarer du det → del ut 6 slurker.', state: 'idle'},
+    {t: 'Snik ordet «campingstol» inn i tre ulike samtaler uten at noen reagerer.', state: 'idle'},
+    {t: 'Bytt drikke med noen uten at de merker det før neste runde.', state: 'idle'}
+  ];
   TYPES = ['regel', 'pekelek', 'quiz', 'duell', 'kategori', 'hemmelig', 'bunnefest'];
   EMOJIS = ['🍺', '🤠', '🦍', '👹', '🐍', '🤡', '🔥', '🍕', '😈', '🎸', '🪩', '🥴'];
+  state = {
+    screen: 'onboard', name: '', emoji: '🍺', avatar: null, code: '',
+    fbReady: false, busy: false, room: null,
+    tab: 'kveld', adminOpen: false, pin: '', isAdmin: false, adminTab: 'runder',
+    editIdx: null, edit: null, taskEditIdx: null, taskText: '', toast: null
+  };
+  constructor(...args) {
+    super(...args);
+    let pid = null;
+    try { pid = localStorage.getItem('vorset_pid'); } catch (e) {}
+    if (!pid) {
+      pid = 'p' + Math.random().toString(36).slice(2, 10);
+      try { localStorage.setItem('vorset_pid', pid); } catch (e) {}
+    }
+    this.pid = pid;
+    this._seenToast = 0;
+  }
+  componentDidMount() {
+    const boot = () => this.setState({fbReady: true});
+    if (window.VDB) boot(); else window.addEventListener('vdb-ready', boot, {once: true});
+    const h = (location.hash || '').replace('#', '').toUpperCase();
+    const patch = {};
+    if (/^[A-Z0-9]{4}$/.test(h)) patch.code = h;
+    try {
+      const me = JSON.parse(localStorage.getItem('vorset_me') || 'null');
+      if (me) { if (me.name) patch.name = me.name; if (me.emoji) patch.emoji = me.emoji; if (me.avatar) patch.avatar = me.avatar; }
+    } catch (e) {}
+    if (Object.keys(patch).length) this.setState(patch);
+  }
+  componentWillUnmount() { clearTimeout(this._tt); if (this._off) this._off(); }
+  arr(v) {
+    if (Array.isArray(v)) return v.filter(x => x != null);
+    if (v && typeof v === 'object') return Object.keys(v).sort((a, b) => a - b).map(k => v[k]).filter(x => x != null);
+    return [];
+  }
   showToast(msg) {
     clearTimeout(this._tt);
     this.setState({toast: msg});
     this._tt = setTimeout(() => this.setState({toast: null}), 2800);
   }
-  bumpYou(d) {
-    this.setState(s => ({players: s.players.map(p => p.you ? {...p, pts: p.pts + d} : p)}));
+  rref(path) { const V = window.VDB; return V.ref(V.db, 'rooms/' + this.state.code + (path ? '/' + path : '')); }
+  rset(path, val) { return window.VDB.set(this.rref(path), val).catch(e => this.showToast('SYNK FEILA 🚫')); }
+  rupd(path, obj) { return window.VDB.update(this.rref(path), obj).catch(e => this.showToast('SYNK FEILA 🚫')); }
+  bump(pid, d) { window.VDB.runTransaction(this.rref('players/' + pid + '/pts'), c => (c || 0) + d); }
+  shout(msg) { this.rset('toast', {msg, ts: Date.now()}); }
+  join(create) {
+    const V = window.VDB;
+    if (!V) { this.showToast('KOBLER TIL… PRØV IGJEN OM 2 SEK'); return; }
+    let code = create
+      ? Array.from({length: 4}, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('')
+      : (this.state.code || '').toUpperCase().trim();
+    if (!/^[A-Z0-9]{4}$/.test(code)) { this.showToast('SKRIV EN 4-TEGNS ROMKODE 🔑'); return; }
+    const name = (this.state.name || 'anonym').trim().toLowerCase();
+    this.setState({busy: true, code});
+    const roomRef = V.ref(V.db, 'rooms/' + code);
+    V.get(roomRef).then(snap => {
+      const cur = snap.val();
+      const upd = {};
+      if (!cur || !cur.rounds) {
+        upd.rounds = this.DEFAULT_ROUNDS;
+        upd.tasks = this.DEFAULT_TASKS;
+        upd.roundIdx = 0;
+        upd.interval = 15;
+        upd.created = Date.now();
+      }
+      const old = (cur && cur.players && cur.players[this.pid]) || null;
+      const me = {
+        name, emoji: this.state.emoji,
+        pts: old ? (old.pts || 0) : 0,
+        benched: old ? !!old.benched : false,
+        joined: old ? (old.joined || Date.now()) : Date.now()
+      };
+      const img = this.state.avatar || (old && old.img) || null;
+      if (img) me.img = img;
+      upd['players/' + this.pid] = me;
+      try { localStorage.setItem('vorset_me', JSON.stringify({name, emoji: this.state.emoji, avatar: img})); } catch (e) {}
+      return V.update(roomRef, upd);
+    }).then(() => {
+      try { location.hash = code; } catch (e) {}
+      this._off = V.onValue(roomRef, snap => {
+        const room = snap.val() || {};
+        const t = room.toast;
+        if (t && t.ts && t.ts > this._seenToast) { this._seenToast = t.ts; this.showToast(t.msg); }
+        this.setState({room, screen: 'app', busy: false});
+      }, err => { this.showToast('INGEN TILGANG TIL DATABASEN 🚫'); this.setState({busy: false}); });
+    }).catch(e => {
+      this.setState({busy: false});
+      this.showToast('FIKK IKKE KOBLET TIL 🚫');
+    });
   }
-  componentWillUnmount() { clearTimeout(this._tt); clearTimeout(this._st); }
   renderVals() {
-    const s = this.state, R = s.rounds, r = R[s.roundIdx] || R[0];
+    const s = this.state, room = s.room || {};
     const Y = '#F5D40A', K = '#111', W = '#FBF7EC', RED = '#E33B2E';
-    const join = () => {
-      const name = (s.name || 'deg').trim().toLowerCase();
-      this.setState({screen: 'app', players: [...s.players, {name, emoji: s.emoji, img: s.avatar, pts: 0, you: true, benched: false}]});
-      const delay = (this.props.demoSecretDelay ?? 8) * 1000;
-      this._st = setTimeout(() => {
-        this.setState(st => ({secretOpen: true, secretTask: st.tasks[0].t, tasks: st.tasks.map((t, i) => i === 0 ? {...t, who: name + ' (deg)'} : t)}));
-      }, delay);
-    };
+    const R = this.arr(room.rounds);
+    const roundIdx = Math.min(room.roundIdx || 0, Math.max(0, R.length - 1));
+    const r = R[roundIdx] || {type: 'regel', title: '…', body: ''};
+    const tasks = this.arr(room.tasks);
+    const players = Object.keys(room.players || {}).map(id => {
+      const p = room.players[id];
+      return {id, name: p.name, emoji: p.emoji, img: p.img || null, pts: p.pts || 0, benched: !!p.benched, joined: p.joined || 0, you: id === this.pid};
+    }).sort((a, b) => a.joined - b.joined);
+    const active = players.filter(p => !p.benched);
+    const others = active.filter(p => !p.you);
+    const votes = ((room.votes || {})[roundIdx]) || {};
+    const myVote = votes[this.pid];
+    const voteCount = {};
+    Object.keys(votes).forEach(k => { voteCount[votes[k]] = (voteCount[votes[k]] || 0) + 1; });
+    const quiz = ((room.quiz || {})[roundIdx]) || {};
+    const myPick = quiz[this.pid];
+    const ruleRounds = R.slice(0, roundIdx + 1).filter(x => x.type === 'regel');
+    const myTaskIdx = tasks.findIndex(t => t && t.who === this.pid && t.state === 'sent');
     const takeSelfie = e => {
       const f = e.target && e.target.files && e.target.files[0];
       if (!f) return;
-      const url = URL.createObjectURL(f);
-      const img = new Image();
+      const url = URL.createObjectURL(f), img = new Image();
       img.onload = () => {
-        const S = 128, c = document.createElement('canvas');
+        const S = 112, c = document.createElement('canvas');
         c.width = c.height = S;
-        const ctx = c.getContext('2d');
-        const m = Math.min(img.width, img.height);
+        const ctx = c.getContext('2d'), m = Math.min(img.width, img.height);
         ctx.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, S, S);
         URL.revokeObjectURL(url);
-        this.setState({avatar: c.toDataURL('image/jpeg', 0.82)});
+        this.setState({avatar: c.toDataURL('image/jpeg', 0.75)});
         this.showToast('SE DER JA. FJESET ER LAGRA 📸');
       };
       img.src = url;
     };
-    const nextRound = () => {
-      const idx = (s.roundIdx + 1) % R.length;
-      this.setState({roundIdx: idx, voted: null, quizPick: null});
-      this.showToast('RUNDE ' + (idx + 1) + ' I GANG →');
-    };
-    const activePlayers = s.players.filter(p => !p.benched);
-    const others = activePlayers.filter(p => !p.you);
     const pinTarget = String(this.props.adminPin ?? '7067');
-    const press = (d) => {
+    const press = d => {
       if (d === '⌫') return this.setState({pin: s.pin.slice(0, -1)});
       if (!d || s.pin.length >= 4) return;
       const pin = s.pin + d;
@@ -553,53 +636,58 @@ class Component extends DCLogic {
       } else this.setState({pin});
     };
     const ed = s.edit || {type: 'regel', title: '', body: '', opts: ['', '', '', ''], right: 0};
-    const setEd = (patch) => this.setState(st => ({edit: {...st.edit, ...patch}}));
-    const ruleRounds = R.slice(0, s.roundIdx + 1).filter(x => x.type === 'regel');
+    const setEd = patch => this.setState(st => ({edit: {...st.edit, ...patch}}));
     return {
       isOnboard: s.screen === 'onboard', isApp: s.screen === 'app',
-      phone: s.phone, name: s.name,
-      setPhone: e => this.setState({phone: e.target.value}),
+      name: s.name, code: s.code,
       setName: e => this.setState({name: e.target.value}),
+      setCode: e => this.setState({code: (e.target.value || '').toUpperCase().slice(0, 4)}),
       emojis: this.EMOJIS.map(e => ({e, bg: s.emoji === e ? Y : W, pick: () => this.setState({emoji: e})})),
       hasAvatar: !!s.avatar, noAvatar: !s.avatar, avatar: s.avatar,
       takeSelfie, clearSelfie: () => this.setState({avatar: null}),
-      join,
+      joinLabel: s.busy ? 'KOBLER TIL…' : 'BLI MED I VORSET →',
+      join: () => this.join(false),
+      newRoom: () => this.join(true),
+      roomCode: s.code,
+      playerCount: players.length + (players.length === 1 ? ' SPILLER' : ' SPILLERE'),
       tabLabel: s.tab, isKveld: s.tab === 'kveld', isPoeng: s.tab === 'poeng',
       goKveld: () => this.setState({tab: 'kveld'}),
       goPoeng: () => this.setState({tab: 'poeng'}),
       kveldBg: s.tab === 'kveld' ? Y : 'transparent', kveldFg: s.tab === 'kveld' ? K : Y,
       poengBg: s.tab === 'poeng' ? Y : 'transparent', poengFg: s.tab === 'poeng' ? K : Y,
-      roundLabel: 'RUNDE ' + (s.roundIdx + 1) + '/' + R.length,
-      roundBadge: r.type.toUpperCase(), roundTitle: r.title, roundBody: r.body,
+      roundLabel: 'RUNDE ' + (roundIdx + 1) + '/' + Math.max(R.length, 1),
+      roundBadge: (r.type || '').toUpperCase(), roundTitle: r.title, roundBody: r.body,
       activeRule: ruleRounds.length ? ruleRounds[ruleRounds.length - 1].body : 'Ingen aktiv regel — enn så lenge.',
       isPekelek: r.type === 'pekelek', isQuiz: r.type === 'quiz', isDuell: r.type === 'duell',
       duelA: (others[0] || {name: '?'}).name, duelB: (others.length > 1 ? others[others.length - 1] : {name: '?'}).name,
-      voteOpts: s.players.map((p, i) => ({p, i})).filter(x => !x.p.benched).map(({p, i}) => ({
-        name: p.name, emoji: p.emoji, img: p.img || null, hasImg: !!p.img, noImg: !p.img,
-        bg: s.voted === i ? K : W, fg: s.voted === i ? Y : K,
+      voteOpts: active.map(p => ({
+        name: p.name, emoji: p.emoji, img: p.img, hasImg: !!p.img, noImg: !p.img,
+        tally: voteCount[p.id] ? '×' + voteCount[p.id] : '',
+        bg: myVote === p.id ? K : W, fg: myVote === p.id ? Y : K,
         pick: () => {
-          if (s.voted != null) return;
-          this.setState({voted: i, players: s.players.map((q, j) => j === i ? {...q, pts: q.pts + 10} : q)});
-          this.showToast(p.name.toUpperCase() + ' FÅR PEKEFINGEREN → DRIKK 4 🍺');
+          if (myVote) return;
+          this.rset('votes/' + roundIdx + '/' + this.pid, p.id);
+          this.bump(p.id, 10);
+          this.shout(p.name.toUpperCase() + ' FIKK EN PEKEFINGER 👉');
         }
       })),
-      quizOpts: (r.opts || []).map((o, i) => {
+      quizOpts: this.arr(r.opts).map((o, i) => {
         let bg = W, fg = K;
-        if (s.quizPick != null) {
+        if (myPick != null) {
           if (i === r.right) { bg = K; fg = Y; }
-          else if (i === s.quizPick) { bg = RED; fg = '#fff'; }
+          else if (i === myPick) { bg = RED; fg = '#fff'; }
         }
         return {label: o, bg, fg, pick: () => {
-          if (s.quizPick != null) return;
-          this.setState({quizPick: i});
-          if (i === r.right) { this.bumpYou(20); this.showToast('RIKTIG! DEL UT 3 SLURKER 😈'); }
+          if (myPick != null) return;
+          this.rset('quiz/' + roundIdx + '/' + this.pid, i);
+          if (i === r.right) { this.bump(this.pid, 20); this.showToast('RIKTIG! DEL UT 3 SLURKER 😈'); }
           else this.showToast('FEIL. DRIKK 3 SELV 🥴');
         }};
       }),
-      board: [...s.players].sort((a, b) => b.pts - a.pts).map((p, i) => ({
+      board: [...players].sort((a, b) => b.pts - a.pts).map((p, i) => ({
         rank: '#' + (i + 1),
         name: (p.you ? p.name + ' (deg)' : p.name) + (p.benched ? ' · BENKA 🪑' : ''),
-        emoji: p.emoji, img: p.img || null, hasImg: !!p.img, noImg: !p.img, pts: p.pts,
+        emoji: p.emoji, img: p.img, hasImg: !!p.img, noImg: !p.img, pts: p.pts,
         bg: p.you ? K : W, fg: p.you ? Y : K, rowOp: p.benched ? 0.45 : 1
       })),
       adminOpen: s.adminOpen, needsPin: !s.isAdmin, isAdmin: s.isAdmin,
@@ -614,14 +702,18 @@ class Component extends DCLogic {
       runderBg: s.adminTab === 'runder' ? Y : 'transparent', runderFg: s.adminTab === 'runder' ? K : Y,
       oppgaverBg: s.adminTab === 'oppgaver' ? Y : 'transparent', oppgaverFg: s.adminTab === 'oppgaver' ? K : Y,
       folkBg: s.adminTab === 'folk' ? Y : 'transparent', folkFg: s.adminTab === 'folk' ? K : Y,
-      nextRound,
-      interval: s.interval,
-      setIntervalVal: e => this.setState({interval: +e.target.value}),
+      nextRound: () => {
+        const idx = (roundIdx + 1) % Math.max(R.length, 1);
+        this.rset('roundIdx', idx);
+        this.shout('RUNDE ' + (idx + 1) + ' I GANG →');
+      },
+      interval: room.interval || 15,
+      setIntervalVal: e => this.rset('interval', +e.target.value),
       adminRounds: R.map((x, i) => ({
-        n: (i + 1 < 10 ? '0' : '') + (i + 1), title: x.title, badge: x.type.toUpperCase(),
-        bg: i === s.roundIdx ? Y : 'transparent', fg: i === s.roundIdx ? K : Y,
-        jump: () => { this.setState({roundIdx: i, voted: null, quizPick: null, adminOpen: false}); this.showToast('HOPPET TIL RUNDE ' + (i + 1)); },
-        editIt: () => this.setState({editIdx: i, edit: {type: x.type, title: x.title, body: x.body, opts: x.opts ? [...x.opts] : ['', '', '', ''], right: x.right ?? 0}})
+        n: (i + 1 < 10 ? '0' : '') + (i + 1), title: x.title, badge: (x.type || '').toUpperCase(),
+        bg: i === roundIdx ? Y : 'transparent', fg: i === roundIdx ? K : Y,
+        jump: () => { this.rset('roundIdx', i); this.setState({adminOpen: false}); this.shout('HOPPET TIL RUNDE ' + (i + 1)); },
+        editIt: () => this.setState({editIdx: i, edit: {type: x.type, title: x.title, body: x.body, opts: this.arr(x.opts).concat(['', '', '', '']).slice(0, 4), right: x.right ?? 0}})
       })),
       notEditing: s.edit == null, isEditing: s.edit != null,
       editHeader: s.editIdx === -1 ? 'NY LEKE ✍️' : 'ENDRE LEKE ' + (s.editIdx + 1),
@@ -644,27 +736,37 @@ class Component extends DCLogic {
         const nr = {type: e2.type, title: (e2.title || 'UTEN TITTEL').toUpperCase(), body: e2.body || ''};
         if (e2.type === 'quiz') { nr.opts = e2.opts.map(o => o || '?'); nr.right = e2.right ?? 0; }
         const rounds = s.editIdx === -1 ? [...R, nr] : R.map((q, j) => j === s.editIdx ? nr : q);
-        this.setState({rounds, edit: null, editIdx: null});
-        this.showToast(s.editIdx === -1 ? 'LEKE LAGT TIL ✔' : 'LEKE OPPDATERT ✔');
+        this.rset('rounds', rounds);
+        this.setState({edit: null, editIdx: null});
+        this.shout(s.editIdx === -1 ? 'NY LEKE LAGT TIL ✔' : 'EN LEKE BLE ENDRA ✔');
       },
       deleteEdit: () => {
         if (s.editIdx == null || s.editIdx < 0 || R.length <= 1) return;
         const rounds = R.filter((_, j) => j !== s.editIdx);
-        let idx = s.roundIdx;
-        if (idx >= s.editIdx) idx = Math.max(0, idx - 1);
-        this.setState({rounds, roundIdx: idx, edit: null, editIdx: null, voted: null, quizPick: null});
+        this.rupd('', {rounds, roundIdx: roundIdx >= s.editIdx ? Math.max(0, roundIdx - 1) : roundIdx});
+        this.setState({edit: null, editIdx: null});
         this.showToast('LEKEN ER SLETTA 🗑');
       },
       cancelEdit: () => this.setState({edit: null, editIdx: null}),
       canDelete: s.editIdx != null && s.editIdx >= 0 && R.length > 1,
-      adminTasks: s.tasks.map((t, i) => ({
-        t: t.t, who: t.who ? '→ hos ' + t.who : '→ ikke delt ut ennå', canSend: !t.who,
-        send: () => {
-          this.setState({tasks: s.tasks.map((q, j) => j === i ? {...q, who: 'deg (demo)'} : q), secretOpen: true, secretTask: t.t, adminOpen: false});
-        },
-        editIt: () => this.setState({taskEditIdx: i, taskText: t.t}),
-        del: () => { this.setState({tasks: s.tasks.filter((_, j) => j !== i)}); this.showToast('OPPGAVE SLETTA 🗑'); }
-      })),
+      adminTasks: tasks.map((t, i) => {
+        const holder = t.who && room.players && room.players[t.who] ? room.players[t.who].name : null;
+        return {
+          t: t.t,
+          who: t.state === 'sent' ? '→ hos ' + (holder || '?') : (t.state === 'done' ? '✔ fullført' : (t.state === 'failed' ? '✖ avslørt' : '→ ikke delt ut ennå')),
+          canSend: t.state !== 'sent',
+          send: () => {
+            const cands = active.length ? active : players;
+            if (!cands.length) { this.showToast('INGEN Å SENDE TIL 🤷'); return; }
+            const pick = cands[Math.floor(Math.random() * cands.length)];
+            this.rset('tasks/' + i, {t: t.t, who: pick.id, state: 'sent'});
+            this.setState({adminOpen: false});
+            this.showToast('SENDT TIL ' + pick.name.toUpperCase() + ' 🤫');
+          },
+          editIt: () => this.setState({taskEditIdx: i, taskText: t.t}),
+          del: () => { this.rset('tasks', tasks.filter((_, j) => j !== i)); this.showToast('OPPGAVE SLETTA 🗑'); }
+        };
+      }),
       notTaskEditing: s.taskEditIdx == null, isTaskEditing: s.taskEditIdx != null,
       taskHeader: s.taskEditIdx === -1 ? 'NY HEMMELIG OPPGAVE ✍️' : 'ENDRE OPPGAVE',
       taskText: s.taskText,
@@ -673,25 +775,28 @@ class Component extends DCLogic {
       saveTask: () => {
         const txt = (s.taskText || '').trim();
         if (!txt) { this.showToast('SKRIV EN OPPGAVE FØRST ✍️'); return; }
-        const tasks = s.taskEditIdx === -1 ? [...s.tasks, {t: txt, who: null}] : s.tasks.map((q, j) => j === s.taskEditIdx ? {...q, t: txt} : q);
-        this.setState({tasks, taskEditIdx: null, taskText: ''});
+        const next = s.taskEditIdx === -1
+          ? [...tasks, {t: txt, state: 'idle'}]
+          : tasks.map((q, j) => j === s.taskEditIdx ? {...q, t: txt} : q);
+        this.rset('tasks', next);
+        this.setState({taskEditIdx: null, taskText: ''});
         this.showToast(s.taskEditIdx === -1 ? 'OPPGAVE LAGT TIL ✔' : 'OPPGAVE OPPDATERT ✔');
       },
       cancelTask: () => this.setState({taskEditIdx: null, taskText: ''}),
-      adminFolk: s.players.map((p, i) => ({
-        name: p.you ? p.name + ' (deg)' : p.name, emoji: p.emoji, img: p.img || null,
+      adminFolk: players.map(p => ({
+        name: p.you ? p.name + ' (deg)' : p.name, emoji: p.emoji, img: p.img,
         hasImg: !!p.img, noImg: !p.img, pts: p.pts, rowOp: p.benched ? 0.5 : 1,
         benchLabel: p.benched ? 'INN 🎉' : 'BENK 🪑',
-        sip: () => this.showToast(p.name.toUpperCase() + ' MÅ DRIKKE 3 🍻'),
+        sip: () => { this.bump(p.id, -5); this.shout(p.name.toUpperCase() + ' MÅ DRIKKE 3 🍻'); },
         bench: () => {
-          this.setState({players: s.players.map((q, j) => j === i ? {...q, benched: !q.benched} : q)});
-          this.showToast(p.benched ? p.name.toUpperCase() + ' ER MED IGJEN 🎉' : p.name.toUpperCase() + ' ER BENKA — INGEN LEKER 🪑');
+          this.rset('players/' + p.id + '/benched', !p.benched);
+          this.shout(p.benched ? p.name.toUpperCase() + ' ER MED IGJEN 🎉' : p.name.toUpperCase() + ' ER BENKA 🪑');
         },
-        kick: () => { this.setState({players: s.players.filter((_, j) => j !== i)}); this.showToast(p.name.toUpperCase() + ' ER KASTA UT 👋'); }
+        kick: () => { window.VDB.remove(this.rref('players/' + p.id)); this.shout(p.name.toUpperCase() + ' ER KASTA UT 👋'); }
       })),
-      secretOpen: s.secretOpen, secretTask: s.secretTask,
-      secretOk: () => { this.setState({secretOpen: false}); this.bumpYou(30); this.showToast('DEL UT 6 SLURKER 😈'); },
-      secretFail: () => { this.setState({secretOpen: false}); this.showToast('DRIKK 6 SELV. SVAKT. 🥴'); },
+      secretOpen: myTaskIdx >= 0, secretTask: myTaskIdx >= 0 ? tasks[myTaskIdx].t : '',
+      secretOk: () => { this.rupd('tasks/' + myTaskIdx, {state: 'done'}); this.bump(this.pid, 30); this.shout('EN HEMMELIG OPPGAVE BLE FULLFØRT — 6 SLURKER DELES UT 😈'); },
+      secretFail: () => { this.rupd('tasks/' + myTaskIdx, {state: 'failed'}); this.shout('EN AGENT BLE AVSLØRT — DRIKK 6 🥴'); },
       toastMsg: s.toast
     };
   }
