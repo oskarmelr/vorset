@@ -169,8 +169,6 @@ html,body{background:#111}
   <div style="padding:24px 22px 22px;background:#111;color:#F5D40A;position:relative;flex:none">
     <div style="font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:4px">RAUMA ROCK '26 PRESENTERER</div>
     <div style="font-family:'Archivo Black',sans-serif;font-size:58px;line-height:0.95;margin-top:6px">VORSET<span style="color:#fff">.</span></div>
-    <div style="margin-top:8px;font-size:13px;font-weight:500;color:#fff;opacity:0.85">Én kveld. Mange leker. Null nåde.</div>
-    <div style="position:absolute;right:14px;bottom:-16px;background:#E33B2E;color:#fff;font-family:'Archivo Black',sans-serif;font-size:10px;padding:6px 10px;transform:rotate(4deg);border:2px solid #111;box-shadow:3px 3px 0 #111">18+ · GRISETE OPPGAVER</div>
   </div>
   <div style="flex:1;padding:30px 22px 24px;display:flex;flex-direction:column;gap:14px;overflow:auto">
     <div style="display:flex;flex-direction:column;gap:6px">
@@ -219,20 +217,40 @@ html,body{background:#111}
     <div style="font-family:'Archivo Black',sans-serif;font-size:11px;border:2px solid #F5D40A;padding:3px 6px;letter-spacing:2px">{{ roomCode }}</div>
     <div style="margin-left:auto;font-family:'Archivo Black',sans-serif;font-size:11px;background:#F5D40A;color:#111;padding:4px 7px;transform:rotate(-2deg)">{{ roundLabel }}</div>
   </div>
+  <sc-if value="{{ hasStarted }}" hint-placeholder-val="{{ true }}">
   <div style="flex:none;background:#E33B2E;color:#fff;padding:7px 18px;font-size:12px;font-weight:700;display:flex;gap:8px;align-items:center">
     <span style="font-family:'Archivo Black',sans-serif;font-size:10px;background:#fff;color:#E33B2E;padding:2px 5px">REGEL</span>
     <span>{{ activeRule }}</span>
   </div>
+  </sc-if>
 
   <sc-if value="{{ isKveld }}" hint-placeholder-val="{{ true }}">
   <div style="flex:1;overflow:auto;padding:22px 18px 16px;display:flex;flex-direction:column;gap:16px">
+    <sc-if value="{{ notStarted }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#FBF7EC;border:3px solid #111;box-shadow:6px 6px 0 #111;transform:rotate(-0.6deg);padding:20px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center">
+        <div style="font-family:'Archivo Black',sans-serif;font-size:11px;background:#111;color:#F5D40A;padding:4px 8px;letter-spacing:2px">VENTEROM</div>
+        <div style="font-family:'Archivo Black',sans-serif;font-size:26px;line-height:1.05">VENTER PÅ SJEFEN</div>
+        <div style="font-size:14px;font-weight:500;line-height:1.45">Del romkoden så alle er inne før kvelden settes i gang.</div>
+        <div style="font-family:'Archivo Black',sans-serif;font-size:44px;letter-spacing:10px;border:3px solid #111;padding:10px 8px 10px 18px;background:#F5D40A">{{ roomCode }}</div>
+        <button sc-camel-on-click="{{ invite }}" style="width:100%;border:3px solid #111;background:#111;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:15px;padding:14px;cursor:pointer">INVITER FOLK 📤</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ hasStarted }}" hint-placeholder-val="{{ true }}">
     <div style="background:#FBF7EC;border:3px solid #111;box-shadow:6px 6px 0 #111;transform:rotate(-0.6deg);padding:18px;animation:pop 0.3s ease-out">
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-family:'Archivo Black',sans-serif;font-size:11px;background:#111;color:#F5D40A;padding:4px 8px;letter-spacing:1px">{{ roundBadge }}</span>
+        <button sc-camel-on-click="{{ toggleInfo }}" style="margin-left:auto;border:2px solid #111;background:transparent;color:#111;font-family:'Archivo Black',sans-serif;font-size:13px;width:30px;height:30px;cursor:pointer;line-height:1">i</button>
       </div>
       <div style="font-family:'Archivo Black',sans-serif;font-size:30px;line-height:1;margin-top:10px">{{ roundTitle }}</div>
       <div style="font-size:15px;font-weight:500;margin-top:10px;line-height:1.45">{{ roundBody }}</div>
+      <sc-if value="{{ infoOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px;border-top:3px solid #111;padding-top:12px">
+          <div style="font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:2px;margin-bottom:6px">SLIK FUNKER DEN</div>
+          <div style="font-size:14px;font-weight:500;line-height:1.5">{{ roundInfo }}</div>
+        </div>
+      </sc-if>
     </div>
+    </sc-if>
 
     <sc-if value="{{ isPekelek }}" hint-placeholder-val="{{ false }}">
       <div style="font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:2px">PEK PÅ SYNDEREN:</div>
@@ -268,7 +286,16 @@ html,body{background:#111}
   <sc-if value="{{ isPoeng }}" hint-placeholder-val="{{ false }}">
   <div data-screen-label="Leaderboard" style="flex:1;overflow:auto;padding:22px 18px">
     <div style="font-family:'Archivo Black',sans-serif;font-size:26px">KVELDENS HELTER</div>
-    <div style="font-size:12px;font-weight:500;opacity:0.7;margin-bottom:16px">{{ playerCount }} i rom {{ roomCode }} · sistemann spanderer i morra.</div>
+    <div style="font-size:12px;font-weight:500;opacity:0.7;margin-bottom:14px">{{ playerCount }} · sistemann spanderer i morra.</div>
+    <div style="border:3px solid #111;background:#FBF7EC;box-shadow:5px 5px 0 #111;padding:14px;margin-bottom:18px;display:flex;flex-direction:column;gap:10px;align-items:center">
+      <div style="font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:3px">ROMKODE</div>
+      <div style="font-family:'Archivo Black',sans-serif;font-size:40px;letter-spacing:9px;line-height:1;padding-left:9px">{{ roomCode }}</div>
+      <button sc-camel-on-click="{{ invite }}" style="width:100%;border:3px solid #111;background:#111;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:14px;padding:13px;cursor:pointer">INVITER FOLK 📤</button>
+      <div style="display:flex;gap:8px;width:100%">
+        <a href="{{ smsHref }}" style="flex:1;text-align:center;border:2px solid #111;color:#111;font-family:'Archivo Black',sans-serif;font-size:11px;padding:10px 0;text-decoration:none">SEND SMS 💬</a>
+        <button sc-camel-on-click="{{ copyLink }}" style="flex:1;border:2px solid #111;background:transparent;color:#111;font-family:'Archivo Black',sans-serif;font-size:11px;padding:10px 0;cursor:pointer">KOPIER LENKE 🔗</button>
+      </div>
+    </div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <sc-for list="{{ board }}" as="p" hint-placeholder-count="7">
         <div style="display:flex;align-items:center;gap:12px;border:3px solid #111;background:{{ p.bg }};color:{{ p.fg }};padding:10px 14px;box-shadow:3px 3px 0 #111;opacity:{{ p.rowOp }}">
@@ -320,10 +347,15 @@ html,body{background:#111}
   <sc-if value="{{ isRunder }}" hint-placeholder-val="{{ true }}">
   <sc-if value="{{ notEditing }}" hint-placeholder-val="{{ true }}">
   <div style="flex:1;overflow:auto;padding:6px 18px 20px;display:flex;flex-direction:column;gap:12px">
+    <sc-if value="{{ notStarted }}" hint-placeholder-val="{{ false }}">
+      <button sc-camel-on-click="{{ startNight }}" style="border:3px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:17px;padding:16px 0;cursor:pointer">START KVELDEN 🚀</button>
+    </sc-if>
+    <sc-if value="{{ hasStarted }}" hint-placeholder-val="{{ true }}">
     <div style="display:flex;gap:10px">
       <button sc-camel-on-click="{{ nextRound }}" style="flex:1;border:3px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:15px;padding:14px 0;cursor:pointer">NESTE RUNDE →</button>
       <button sc-camel-on-click="{{ nextRound }}" style="flex:none;border:3px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:12px;padding:14px 12px;cursor:pointer">HOPP OVER</button>
     </div>
+    </sc-if>
     <div style="border:2px solid rgba(245,212,10,0.3);padding:12px 14px;display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700"><span>AUTO-PÅMINNELSE OM NESTE RUNDE</span><span style="font-family:'Archivo Black',sans-serif">{{ interval }} MIN</span></div>
       <input type="range" min="5" max="45" step="5" value="{{ interval }}" sc-camel-on-change="{{ setIntervalVal }}" style="width:100%;accentColor:#F5D40A">
@@ -361,6 +393,10 @@ html,body{background:#111}
     <div style="display:flex;flex-direction:column;gap:6px">
       <label style="font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:2px;opacity:0.8">TEKST / REGLER</label>
       <textarea value="{{ editBody }}" sc-camel-on-change="{{ setEditBody }}" rows="3" placeholder="Hva skjer i denne leken? Hvem drikker hvor mye?" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;padding:11px 12px;font-size:14px;font-weight:500;font-family:'Space Grotesk',sans-serif;resize:vertical;border-radius:0"></textarea>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <label style="font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:2px;opacity:0.8">INFO (vises bak ⓘ)</label>
+      <textarea value="{{ editInfo }}" sc-camel-on-change="{{ setEditInfo }}" rows="2" placeholder="Kort og konsist: hvordan spilles den, hvem drikker hvor mye?" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;padding:11px 12px;font-size:14px;font-weight:500;font-family:'Space Grotesk',sans-serif;resize:vertical;border-radius:0"></textarea>
     </div>
     <sc-if value="{{ editIsQuiz }}" hint-placeholder-val="{{ false }}">
     <div style="display:flex;flex-direction:column;gap:6px">
@@ -484,25 +520,50 @@ html,body{background:#111}
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;adminPin&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;7067&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Admin&quot;},&quot;demoSecretDelay&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:0,&quot;max&quot;:60,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
 class Component extends DCLogic {
   DEFAULT_ROUNDS = [
-    {type: 'regel', title: 'NY REGEL I HUSET', body: 'Fra nå: forbudt å si ordet «drikke». 2 slurker per glipp. Gjelder til neste regel-runde.'},
-    {type: 'pekelek', title: 'HVEM HER HADDE OVERLEVD KORTEST I FENGSEL?', body: 'Alle peker på tre. Den med flest pekefingre drikker 4.'},
-    {type: 'quiz', title: 'HVILKET ÅR VAR FØRSTE RAUMA ROCK?', body: 'Feil svar = 3 slurker. Riktig = del ut 3.', opts: ['1998', '2003', '2007', '2012'], right: 1},
-    {type: 'duell', title: 'STIRREKONKURRANSE', body: 'Første som blunker eller ler drikker 5. Resten heier.'},
-    {type: 'kategori', title: 'KATEGORI: NORSKE FESTIVALER', body: 'Etter tur med klokka. Nøler du over 5 sek eller gjentar — drikk 4.'},
-    {type: 'hemmelig', title: 'HEMMELIGE OPPGAVER ER UTE', body: 'Noen i rommet har akkurat fått et oppdrag på mobilen. Stol ikke på noen.'},
-    {type: 'bunnefest', title: 'BUNNEFEST 🌊', body: 'Alle reiser seg. Yngstemann starter — du kan ikke stoppe før personen til venstre for deg stopper.'}
+    {type: 'regel', title: 'FORBUDT ORD: «DRIKKE»', body: 'Fra nå er ordet «drikke» bannlyst. Si det, og du tar 2 slurker.',
+     info: 'Gjelder til neste regel-runde. Den som tar deg må si det høyt — tar du feil, drikker du selv 2.'},
+    {type: 'pekelek', title: 'HVEM HER HADDE OVERLEVD KORTEST I FENGSEL?', body: 'Alle peker samtidig. Flest fingre mot seg drikker 4.',
+     info: 'Trykk på den du peker på. Ingen forklaring før alle har stemt. Uavgjort = begge drikker.'},
+    {type: 'sosialt', title: 'PSYKIATEREN', body: 'Én går ut av rommet. Resten blir enige om noe alle har til felles. Den som var ute skal finne ut hva.',
+     info: 'Psykiateren stiller kun ja/nei-spørsmål til enkeltpersoner. Gjetter riktig: alle andre drikker 3. Bommer tre ganger: psykiateren drikker 4.'},
+    {type: 'quiz', title: 'HVILKET ÅR VAR FØRSTE RAUMA ROCK?', body: 'Feil svar = 3 slurker. Riktig = del ut 3.', opts: ['1986', '1997', '2004', '2011'], right: 1,
+     info: 'Alle svarer på egen telefon. Du ser fasit med en gang du har trykket.'},
+    {type: 'regel', title: 'VENSTREHÅNDSREGELEN', body: 'Glasset skal holdes i venstre hånd. Resten av kvelden.',
+     info: 'Blir du tatt med glasset i høyre hånd: 2 slurker. Keivhendte holder i høyre. Gjelder til neste regel-runde.'},
+    {type: 'mobil', title: 'SISTE BILDE I KAMERARULLEN', body: 'Alle åpner galleriet og viser det aller siste bildet. Samtidig.',
+     info: 'Ingen scrolling, ingen forklaring på forhånd. Nekter du: 4 slurker. Forklaring er lov etterpå — og som regel nødvendig.'},
+    {type: 'duell', title: 'STIRREKONKURRANSE', body: 'To utfordrere. Første som blunker eller ler drikker 5.',
+     info: 'Armlengdes avstand, ingen grimaser. Resten er publikum og har lov til å være ubehagelige.'},
+    {type: 'sosialt', title: 'TO SANNHETER OG EN LØGN', body: 'Etter tur: si tre påstander om deg selv. Én er løgn. Resten stemmer.',
+     info: 'Flertallet gjetter feil → alle andre drikker 2. Flertallet gjetter riktig → forteller drikker 3.'},
+    {type: 'kategori', title: 'KATEGORI: NORSKE FESTIVALER', body: 'Etter tur med klokka. Nøler du over 5 sekunder eller gjentar — 4 slurker.',
+     info: 'Ingen gjentakelser, ingen googling. Den som ryker starter neste kategori.'},
+    {type: 'regel', title: 'FORBUDT BOKSTAV: S', body: 'Ingen ord med bokstaven S. Gjelder alle, hele tiden.',
+     info: 'Blir du tatt: 2 slurker. Ja, «slurk» inneholder S. Det er hele poenget. Gjelder til neste regel-runde.'},
+    {type: 'mobil', title: 'MEST SPILTE LÅT', body: 'Alle finner fram sin mest spilte låt i år og viser skjermen.',
+     info: 'Gruppa kårer den flaueste med håndsopprekning. Vinneren drikker 4 — og låta settes på.'},
+    {type: 'hemmelig', title: 'HEMMELIGE OPPGAVER ER UTE', body: 'Noen i rommet har akkurat fått et oppdrag på mobilen. Stol ikke på noen.',
+     info: 'Oppgaven kommer bare opp på én telefon. Klarer de den: deler ut 6 slurker. Blir de avslørt: drikker 6 selv.'},
+    {type: 'pause', title: 'VANNPAUSE 💧', body: 'Alle henter et glass vann og tar det før neste runde starter.',
+     info: 'Ingen slurker deles ut her. Den som skulker vannet får 2 ekstra senere — sjefen husker.'},
+    {type: 'sosialt', title: 'AKSENTRUNDEN', body: 'Trekk en dialekt eller aksent. Alle snakker sånn til neste runde.',
+     info: 'Faller du ut av aksenten og noen tar deg: 2 slurker. Sjefen dømmer i tvilstilfeller.'},
+    {type: 'duell', title: 'TELEFONTÅRNET', body: 'Alle stabler telefonene i en haug midt på bordet.',
+     info: 'Første som tar telefonen sin før tårnet rives, drikker 5. Tårnet står til sjefen sier stopp.'},
+    {type: 'bunnefest', title: 'BUNNEFEST 🌊', body: 'Alle reiser seg. Yngstemann starter — du kan ikke stoppe før personen til venstre for deg stopper.',
+     info: 'Kjeden går mot klokka. Har du ikke noe igjen i glasset, er du ferdig med en gang. Vann teller.'}
   ];
   DEFAULT_TASKS = [
     {t: 'Få noen til å si «Rauma Rock» høyt uten å spørre direkte. Klarer du det → del ut 6 slurker.', state: 'idle'},
     {t: 'Snik ordet «campingstol» inn i tre ulike samtaler uten at noen reagerer.', state: 'idle'},
     {t: 'Bytt drikke med noen uten at de merker det før neste runde.', state: 'idle'}
   ];
-  TYPES = ['regel', 'pekelek', 'quiz', 'duell', 'kategori', 'hemmelig', 'bunnefest'];
+  TYPES = ['regel', 'pekelek', 'quiz', 'duell', 'kategori', 'sosialt', 'mobil', 'hemmelig', 'pause', 'bunnefest'];
   EMOJIS = ['🍺', '🤠', '🦍', '👹', '🐍', '🤡', '🔥', '🍕', '😈', '🎸', '🪩', '🥴'];
   state = {
     screen: 'onboard', name: '', emoji: '🍺', avatar: null, code: '',
     fbReady: false, busy: false, room: null,
-    tab: 'kveld', adminOpen: false, pin: '', isAdmin: false, adminTab: 'runder',
+    tab: 'poeng', infoOpen: false, adminOpen: false, pin: '', isAdmin: false, adminTab: 'runder',
     editIdx: null, edit: null, taskEditIdx: null, taskText: '', toast: null
   };
   constructor(...args) {
@@ -561,6 +622,7 @@ class Component extends DCLogic {
         upd.rounds = this.DEFAULT_ROUNDS;
         upd.tasks = this.DEFAULT_TASKS;
         upd.roundIdx = 0;
+        upd.started = false;
         upd.interval = 15;
         upd.created = Date.now();
       }
@@ -635,7 +697,7 @@ class Component extends DCLogic {
         else { this.setState({pin: ''}); this.showToast('FEIL PIN, PRØV IGJEN 🚫'); }
       } else this.setState({pin});
     };
-    const ed = s.edit || {type: 'regel', title: '', body: '', opts: ['', '', '', ''], right: 0};
+    const ed = s.edit || {type: 'regel', title: '', body: '', info: '', opts: ['', '', '', ''], right: 0};
     const setEd = patch => this.setState(st => ({edit: {...st.edit, ...patch}}));
     return {
       isOnboard: s.screen === 'onboard', isApp: s.screen === 'app',
@@ -655,7 +717,25 @@ class Component extends DCLogic {
       goPoeng: () => this.setState({tab: 'poeng'}),
       kveldBg: s.tab === 'kveld' ? Y : 'transparent', kveldFg: s.tab === 'kveld' ? K : Y,
       poengBg: s.tab === 'poeng' ? Y : 'transparent', poengFg: s.tab === 'poeng' ? K : Y,
-      roundLabel: 'RUNDE ' + (roundIdx + 1) + '/' + Math.max(R.length, 1),
+      hasStarted: !!room.started, notStarted: !room.started,
+      roundLabel: room.started ? 'RUNDE ' + (roundIdx + 1) + '/' + Math.max(R.length, 1) : 'IKKE STARTA',
+      startNight: () => { this.rupd('', {started: true, roundIdx: 0}); this.setState({adminOpen: false, tab: 'kveld'}); this.shout('KVELDEN ER I GANG 🚀'); },
+      infoOpen: s.infoOpen, infoClosed: !s.infoOpen,
+      roundInfo: r.info || 'Ingen ekstra regler — bare gjør som det står.',
+      toggleInfo: () => this.setState({infoOpen: !s.infoOpen}),
+      invite: () => {
+        const url = location.origin + location.pathname + '#' + s.code;
+        const text = 'Bli med på VORSET! Romkode: ' + s.code + ' → ' + url;
+        if (navigator.share) { navigator.share({title: 'VORSET.', text, url}).catch(() => {}); return; }
+        if (navigator.clipboard) { navigator.clipboard.writeText(text); this.showToast('LENKE KOPIERT 📋'); return; }
+        this.showToast('KOPIER LENKA FRA ADRESSEFELTET 📋');
+      },
+      smsHref: 'sms:&body=' + encodeURIComponent('Bli med på VORSET! Romkode: ' + s.code + ' → ' + location.origin + location.pathname + '#' + s.code),
+      copyLink: () => {
+        const url = location.origin + location.pathname + '#' + s.code;
+        if (navigator.clipboard) { navigator.clipboard.writeText(url); this.showToast('LENKE KOPIERT 📋'); }
+        else this.showToast('KOPIER FRA ADRESSEFELTET 📋');
+      },
       roundBadge: (r.type || '').toUpperCase(), roundTitle: r.title, roundBody: r.body,
       activeRule: ruleRounds.length ? ruleRounds[ruleRounds.length - 1].body : 'Ingen aktiv regel — enn så lenge.',
       isPekelek: r.type === 'pekelek', isQuiz: r.type === 'quiz', isDuell: r.type === 'duell',
@@ -713,13 +793,14 @@ class Component extends DCLogic {
         n: (i + 1 < 10 ? '0' : '') + (i + 1), title: x.title, badge: (x.type || '').toUpperCase(),
         bg: i === roundIdx ? Y : 'transparent', fg: i === roundIdx ? K : Y,
         jump: () => { this.rset('roundIdx', i); this.setState({adminOpen: false}); this.shout('HOPPET TIL RUNDE ' + (i + 1)); },
-        editIt: () => this.setState({editIdx: i, edit: {type: x.type, title: x.title, body: x.body, opts: this.arr(x.opts).concat(['', '', '', '']).slice(0, 4), right: x.right ?? 0}})
+        editIt: () => this.setState({editIdx: i, edit: {type: x.type, title: x.title, body: x.body, info: x.info || '', opts: this.arr(x.opts).concat(['', '', '', '']).slice(0, 4), right: x.right ?? 0}})
       })),
       notEditing: s.edit == null, isEditing: s.edit != null,
       editHeader: s.editIdx === -1 ? 'NY LEKE ✍️' : 'ENDRE LEKE ' + (s.editIdx + 1),
-      editTitle: ed.title, editBody: ed.body,
+      editTitle: ed.title, editBody: ed.body, editInfo: ed.info || '',
       setEditTitle: e => setEd({title: e.target.value}),
       setEditBody: e => setEd({body: e.target.value}),
+      setEditInfo: e => setEd({info: e.target.value}),
       editTypes: this.TYPES.map(t => ({
         label: t.toUpperCase(), bg: ed.type === t ? Y : 'transparent', fg: ed.type === t ? K : Y,
         pick: () => setEd({type: t})
@@ -730,10 +811,10 @@ class Component extends DCLogic {
         set: e => { const v = e.target.value; this.setState(st => ({edit: {...st.edit, opts: st.edit.opts.map((q, j) => j === i ? v : q)}})); },
         mark: () => setEd({right: i})
       })),
-      openNewRound: () => this.setState({editIdx: -1, edit: {type: 'regel', title: '', body: '', opts: ['', '', '', ''], right: 0}}),
+      openNewRound: () => this.setState({editIdx: -1, edit: {type: 'regel', title: '', body: '', info: '', opts: ['', '', '', ''], right: 0}}),
       saveEdit: () => {
         const e2 = s.edit; if (!e2) return;
-        const nr = {type: e2.type, title: (e2.title || 'UTEN TITTEL').toUpperCase(), body: e2.body || ''};
+        const nr = {type: e2.type, title: (e2.title || 'UTEN TITTEL').toUpperCase(), body: e2.body || '', info: e2.info || ''};
         if (e2.type === 'quiz') { nr.opts = e2.opts.map(o => o || '?'); nr.right = e2.right ?? 0; }
         const rounds = s.editIdx === -1 ? [...R, nr] : R.map((q, j) => j === s.editIdx ? nr : q);
         this.rset('rounds', rounds);
