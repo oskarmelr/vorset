@@ -13,6 +13,22 @@ Drikkelekapp for vors under Rauma Rock '26. Festivalplakat/punk-design — Archi
 
 Leaderboardet er hovedsiden. Hver leke har en **ⓘ-knapp** som viser en kort forklaring av reglene.
 
+## Rundestart
+Hver gang en ny runde settes i gang popper det opp en fullskjerm-intro hos alle samtidig: rundenummer, type, tittel, hva som skal skje, de korte reglene — og hvem som er trukket ut. Man trykker «KLAR →» for å gå videre.
+
+En **tilfeldig aktiv spiller** trekkes ut hver runde og vises med 🎯 både i introen og på rundekortet. I quiz-runder er det den utvalgte som svarer; de andre får beskjed om at det ikke er deres tur. Admin kan trekke ny spiller med 🎲-knappen.
+
+## Beerpong-turnering
+Egen **PONG**-fane nederst.
+
+1. Admin åpner en turnering med **«NY TURNERING — ÅPNE FOR LAG»**.
+2. Alle velger makker selv: trykk på et navn → den andre får «X vil ha deg på lag» og må trykke **JA**. Først når begge har godtatt teller laget.
+3. Admin trykker **«SETT OPP KAMPENE»**, og det genereres et turneringsoppsett med semifinaler/kvartfinaler fram mot finalen. Er antall lag ikke en toerpotens, går noen automatisk videre på bye.
+4. Admin kårer vinner ved å trykke på laget i hver kamp. Vinneren føres videre i diagrammet automatisk.
+5. Seierslaget får **👑** ved navnet sitt resten av kvelden — på leaderboardet, i pekeleker og i admin.
+
+Admin kan fjerne krona fra en spiller med **👑✕** i FOLK-fanen, og starte en ny turnering når som helst.
+
 Legg appen på hjemskjermen: åpne linken i Safari → Del → «Legg til på Hjem-skjerm».
 
 ## Lekene

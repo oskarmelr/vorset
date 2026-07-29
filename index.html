@@ -235,6 +235,11 @@ html,body{background:#111}
         <button sc-camel-on-click="{{ invite }}" style="width:100%;border:3px solid #111;background:#111;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:15px;padding:14px;cursor:pointer">INVITER FOLK 📤</button>
       </div>
     </sc-if>
+    <sc-if value="{{ hasPicked }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#111;color:#F5D40A;border:3px solid #111;padding:10px 14px;display:flex;align-items:center;gap:10px;font-family:'Archivo Black',sans-serif;font-size:14px;letter-spacing:1px">
+        <span style="font-size:18px">🎯</span><span>{{ pickedLabel }}</span>
+      </div>
+    </sc-if>
     <sc-if value="{{ hasStarted }}" hint-placeholder-val="{{ true }}">
     <div style="background:#FBF7EC;border:3px solid #111;box-shadow:6px 6px 0 #111;transform:rotate(-0.6deg);padding:18px;animation:pop 0.3s ease-out">
       <div style="display:flex;align-items:center;gap:8px">
@@ -309,9 +314,88 @@ html,body{background:#111}
   </div>
   </sc-if>
 
-  <div style="flex:none;background:#111;display:flex;padding:10px 14px 12px;gap:10px">
-    <button sc-camel-on-click="{{ goKveld }}" style="flex:1;border:2px solid #F5D40A;background:{{ kveldBg }};color:{{ kveldFg }};font-family:'Archivo Black',sans-serif;font-size:13px;padding:12px 0;cursor:pointer;letter-spacing:1px">KVELDEN</button>
-    <button sc-camel-on-click="{{ goPoeng }}" style="flex:1;border:2px solid #F5D40A;background:{{ poengBg }};color:{{ poengFg }};font-family:'Archivo Black',sans-serif;font-size:13px;padding:12px 0;cursor:pointer;letter-spacing:1px">POENG</button>
+  <sc-if value="{{ isPong }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Beerpong" style="flex:1;overflow:auto;padding:22px 18px">
+    <div style="font-family:'Archivo Black',sans-serif;font-size:26px">BEERPONG 🏓</div>
+
+    <sc-if value="{{ pongIdle }}" hint-placeholder-val="{{ true }}">
+      <div style="font-size:14px;font-weight:500;margin-top:10px;line-height:1.5">Ingen turnering i gang. Sjefen starter en fra admin → PONG.</div>
+    </sc-if>
+
+    <sc-if value="{{ pongPairing }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:13px;font-weight:500;margin:8px 0 16px;opacity:0.75">Finn deg en makker. Begge må si ja før laget teller.</div>
+      <sc-if value="{{ hasInvite }}" hint-placeholder-val="{{ false }}">
+        <div style="border:3px solid #111;background:#111;color:#F5D40A;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:'Archivo Black',sans-serif;font-size:15px">{{ inviteFrom }} VIL HA DEG PÅ LAG</div>
+          <div style="display:flex;gap:8px">
+            <button sc-camel-on-click="{{ acceptInvite }}" style="flex:1;border:2px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:13px;padding:11px;cursor:pointer">JA, KJØR 🏓</button>
+            <button sc-camel-on-click="{{ declineInvite }}" style="flex:1;border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:13px;padding:11px;cursor:pointer">NEI</button>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasTeam }}" hint-placeholder-val="{{ false }}">
+        <div style="border:3px solid #111;background:#FBF7EC;box-shadow:5px 5px 0 #111;padding:16px;text-align:center;margin-bottom:14px">
+          <div style="font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:3px">DITT LAG</div>
+          <div style="font-family:'Archivo Black',sans-serif;font-size:20px;margin-top:6px">{{ myTeamName }}</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noTeam }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ hasSentInvite }}" hint-placeholder-val="{{ false }}">
+          <div style="border:2px dashed #111;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+            <span style="font-weight:700;font-size:14px">Venter på svar fra {{ myInviteSent }}…</span>
+            <button sc-camel-on-click="{{ cancelInvite }}" style="margin-left:auto;border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:10px;padding:6px 9px;cursor:pointer">ANGRE</button>
+          </div>
+        </sc-if>
+        <div style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:2px;margin-bottom:8px">SPØR NOEN:</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ freeMates }}" as="p" hint-placeholder-count="4">
+            <button sc-camel-on-click="{{ p.ask }}" style="display:flex;align-items:center;gap:10px;border:3px solid #111;background:#FBF7EC;padding:11px 13px;cursor:pointer;box-shadow:3px 3px 0 #111;font-family:'Space Grotesk',sans-serif">
+              <sc-if value="{{ p.hasImg }}" hint-placeholder-val="{{ false }}"><img sc-camel-src="{{ p.img }}" alt="" style="width:26px;height:26px;object-fit:cover;border:2px solid #111"></sc-if><sc-if value="{{ p.noImg }}" hint-placeholder-val="{{ true }}"><span style="font-size:20px">{{ p.emoji }}</span></sc-if>
+              <span style="font-weight:700;font-size:15px">{{ p.name }}</span>
+              <span style="margin-left:auto;font-family:'Archivo Black',sans-serif;font-size:11px">SPØR →</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="margin-top:18px;font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:2px">{{ teamCount }}</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+        <sc-for list="{{ pongTeams }}" as="t" hint-placeholder-count="3">
+          <div style="border:2px solid #111;padding:9px 12px;font-weight:700;font-size:14px">{{ t.name }}</div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pongRunning }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:13px;font-weight:500;margin:8px 0 16px;opacity:0.75">Veien mot finalen. Sjefen trykker på laget som vinner hver kamp.</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ bracket }}" as="m" hint-placeholder-count="4">
+          <div>
+            <sc-if value="{{ m.showStage }}" hint-placeholder-val="{{ true }}">
+              <div style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:3px;background:#111;color:#F5D40A;display:inline-block;padding:4px 9px;margin:10px 0 6px">{{ m.stage }}</div>
+            </sc-if>
+            <div style="border:3px solid #111;background:#FBF7EC;box-shadow:4px 4px 0 #111;padding:8px;display:flex;flex-direction:column;gap:6px">
+              <button sc-camel-on-click="{{ m.win1 }}" style="border:2px solid #111;background:{{ m.t1Bg }};color:{{ m.t1Fg }};padding:10px;font-weight:700;font-size:14px;cursor:pointer;text-align:left;font-family:'Space Grotesk',sans-serif">{{ m.t1 }}</button>
+              <div style="font-family:'Archivo Black',sans-serif;font-size:11px;text-align:center;color:#E33B2E">VS</div>
+              <button sc-camel-on-click="{{ m.win2 }}" style="border:2px solid #111;background:{{ m.t2Bg }};color:{{ m.t2Fg }};padding:10px;font-weight:700;font-size:14px;cursor:pointer;text-align:left;font-family:'Space Grotesk',sans-serif">{{ m.t2 }}</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ hasChamp }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:18px;border:3px solid #111;background:#111;color:#F5D40A;padding:18px;text-align:center;box-shadow:5px 5px 0 rgba(0,0,0,0.35)">
+          <div style="font-size:34px">👑</div>
+          <div style="font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:3px;margin-top:4px">MESTERE</div>
+          <div style="font-family:'Archivo Black',sans-serif;font-size:20px;margin-top:6px">{{ champName }}</div>
+        </div>
+      </sc-if>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <div style="flex:none;background:#111;display:flex;padding:10px 12px 12px;gap:7px">
+    <button sc-camel-on-click="{{ goKveld }}" style="flex:1;border:2px solid #F5D40A;background:{{ kveldBg }};color:{{ kveldFg }};font-family:'Archivo Black',sans-serif;font-size:12px;padding:12px 0;cursor:pointer;letter-spacing:1px">KVELD</button>
+    <button sc-camel-on-click="{{ goPoeng }}" style="flex:1;border:2px solid #F5D40A;background:{{ poengBg }};color:{{ poengFg }};font-family:'Archivo Black',sans-serif;font-size:12px;padding:12px 0;cursor:pointer;letter-spacing:1px">POENG</button>
+    <button sc-camel-on-click="{{ goPong }}" style="flex:1;border:2px solid #F5D40A;background:{{ pongBg }};color:{{ pongFg }};font-family:'Archivo Black',sans-serif;font-size:12px;padding:12px 0;cursor:pointer;letter-spacing:1px">PONG</button>
     <button sc-camel-on-click="{{ openAdmin }}" style="flex:none;border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:13px;padding:12px 14px;cursor:pointer">🔒</button>
   </div>
 </div>
@@ -351,11 +435,20 @@ html,body{background:#111}
       <button sc-camel-on-click="{{ startNight }}" style="border:3px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:17px;padding:16px 0;cursor:pointer">START KVELDEN 🚀</button>
     </sc-if>
     <sc-if value="{{ hasStarted }}" hint-placeholder-val="{{ true }}">
+    <button sc-camel-on-click="{{ rerollPick }}" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:12px;padding:11px;cursor:pointer">🎲 TREKK NY SPILLER TIL DENNE RUNDEN</button>
     <div style="display:flex;gap:10px">
       <button sc-camel-on-click="{{ nextRound }}" style="flex:1;border:3px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:15px;padding:14px 0;cursor:pointer">NESTE RUNDE →</button>
       <button sc-camel-on-click="{{ nextRound }}" style="flex:none;border:3px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:12px;padding:14px 12px;cursor:pointer">HOPP OVER</button>
     </div>
     </sc-if>
+    <div style="border:2px solid rgba(245,212,10,0.3);padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:2px">BEERPONG 🏓</div>
+      <button sc-camel-on-click="{{ newPong }}" style="border:2px solid #F5D40A;background:#F5D40A;color:#111;font-family:'Archivo Black',sans-serif;font-size:12px;padding:11px;cursor:pointer">NY TURNERING — ÅPNE FOR LAG</button>
+      <sc-if value="{{ pongPairing }}" hint-placeholder-val="{{ false }}">
+        <button sc-camel-on-click="{{ startPong }}" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:12px;padding:11px;cursor:pointer">SETT OPP KAMPENE ({{ teamCount }})</button>
+      </sc-if>
+      <button sc-camel-on-click="{{ resetPong }}" style="border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:11px;padding:9px;cursor:pointer">AVSLUTT / NULLSTILL TURNERING</button>
+    </div>
     <div style="border:2px solid rgba(245,212,10,0.3);padding:12px 14px;display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700"><span>AUTO-PÅMINNELSE OM NESTE RUNDE</span><span style="font-family:'Archivo Black',sans-serif">{{ interval }} MIN</span></div>
       <input type="range" min="5" max="45" step="5" value="{{ interval }}" sc-camel-on-change="{{ setIntervalVal }}" style="width:100%;accentColor:#F5D40A">
@@ -461,6 +554,9 @@ html,body{background:#111}
         <span style="font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">{{ p.name }}</span>
         <span style="font-size:11px;opacity:0.6">{{ p.pts }}p</span>
         <button sc-camel-on-click="{{ p.sip }}" style="margin-left:auto;border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:10px;padding:5px 7px;cursor:pointer">+3 🍺</button>
+        <sc-if value="{{ p.hasCrown }}" hint-placeholder-val="{{ false }}">
+          <button sc-camel-on-click="{{ p.dropCrown }}" style="border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:10px;padding:5px 7px;cursor:pointer">👑✕</button>
+        </sc-if>
         <button sc-camel-on-click="{{ p.bench }}" style="border:2px solid #F5D40A;background:transparent;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:10px;padding:5px 7px;cursor:pointer">{{ p.benchLabel }}</button>
         <button sc-camel-on-click="{{ p.kick }}" style="border:2px solid #E33B2E;background:transparent;color:#E33B2E;font-family:'Archivo Black',sans-serif;font-size:10px;padding:5px 7px;cursor:pointer">KICK</button>
       </div>
@@ -468,6 +564,25 @@ html,body{background:#111}
   </div>
   </sc-if>
   </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ introOpen }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Rundestart" style="position:absolute;inset:0;background:#F5D40A;color:#111;display:flex;flex-direction:column;justify-content:center;padding:26px;gap:14px;animation:pop 0.3s ease-out;z-index:6">
+  <div style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:4px">{{ introStage }}</div>
+  <div style="background:#111;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:2px;padding:5px 10px;align-self:flex-start">{{ roundBadge }}</div>
+  <div style="font-family:'Archivo Black',sans-serif;font-size:32px;line-height:1.02">{{ roundTitle }}</div>
+  <div style="font-size:16px;font-weight:500;line-height:1.45">{{ roundBody }}</div>
+  <div style="border-top:3px solid #111;padding-top:12px">
+    <div style="font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:2px;margin-bottom:6px">SLIK FUNKER DEN</div>
+    <div style="font-size:14px;font-weight:500;line-height:1.5">{{ roundInfo }}</div>
+  </div>
+  <sc-if value="{{ hasPicked }}" hint-placeholder-val="{{ true }}">
+    <div style="background:#111;color:#F5D40A;padding:12px 14px;font-family:'Archivo Black',sans-serif;font-size:15px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">🎯</span><span>{{ pickedLabel }}</span>
+    </div>
+  </sc-if>
+  <button sc-camel-on-click="{{ closeIntro }}" style="margin-top:6px;border:3px solid #111;background:#111;color:#F5D40A;font-family:'Archivo Black',sans-serif;font-size:17px;padding:16px;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,0.3)">KLAR →</button>
 </div>
 </sc-if>
 
@@ -563,7 +678,7 @@ class Component extends DCLogic {
   state = {
     screen: 'onboard', name: '', emoji: '🍺', avatar: null, code: '',
     fbReady: false, busy: false, room: null,
-    tab: 'poeng', infoOpen: false, adminOpen: false, pin: '', isAdmin: false, adminTab: 'runder',
+    tab: 'poeng', infoOpen: false, introSeen: -99, adminOpen: false, pin: '', isAdmin: false, adminTab: 'runder',
     editIdx: null, edit: null, taskEditIdx: null, taskText: '', toast: null
   };
   constructor(...args) {
@@ -651,6 +766,75 @@ class Component extends DCLogic {
       this.showToast('FIKK IKKE KOBLET TIL 🚫');
     });
   }
+  pickRandom(idx, players) {
+    const cands = players.filter(p => !p.benched);
+    if (!cands.length) return;
+    const win = cands[Math.floor(Math.random() * cands.length)];
+    this.rset('picks/' + idx, win.id);
+  }
+  stageName(stage, total) {
+    const left = total - stage;
+    if (left === 1) return 'FINALE';
+    if (left === 2) return 'SEMIFINALE';
+    if (left === 3) return 'KVARTFINALE';
+    return 'RUNDE ' + (stage + 1);
+  }
+  resolveBracket(matches, stages) {
+    for (let st = 0; st < stages; st++) {
+      const cnt = Math.pow(2, stages - st - 1);
+      for (let m = 0; m < cnt; m++) {
+        const mm = matches['s' + st + 'm' + m];
+        if (!mm) continue;
+        if (!mm.winner && mm.t1 && !mm.t2) mm.winner = mm.t1;
+        if (!mm.winner && !mm.t1 && mm.t2) mm.winner = mm.t2;
+        if (mm.winner && st + 1 < stages) {
+          const nk = 's' + (st + 1) + 'm' + Math.floor(m / 2);
+          if (matches[nk]) { if (m % 2 === 0) matches[nk].t1 = mm.winner; else matches[nk].t2 = mm.winner; }
+        }
+      }
+    }
+    return matches;
+  }
+  buildBracket(teamIds) {
+    const ids = teamIds.slice();
+    for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
+    let size = 1; while (size < ids.length) size *= 2;
+    const stages = Math.max(1, Math.round(Math.log2(size)));
+    const matches = {};
+    for (let st = 0; st < stages; st++) {
+      const cnt = Math.pow(2, stages - st - 1);
+      for (let m = 0; m < cnt; m++) matches['s' + st + 'm' + m] = {stage: st, slot: m, t1: null, t2: null, winner: null};
+    }
+    for (let m = 0; m < size / 2; m++) {
+      matches['s0m' + m].t1 = ids[m * 2] || null;
+      matches['s0m' + m].t2 = ids[m * 2 + 1] || null;
+    }
+    return {matches: this.resolveBracket(matches, stages), stages};
+  }
+  setPongWinner(m, tid) {
+    const room = this.state.room || {};
+    const T = room.pong || {};
+    const matches = JSON.parse(JSON.stringify(T.matches || {}));
+    const key = 's' + m.stage + 'm' + m.slot;
+    if (!matches[key]) return;
+    matches[key].winner = tid;
+    this.resolveBracket(matches, T.stages || 1);
+    const finalKey = 's' + ((T.stages || 1) - 1) + 'm0';
+    const champ = matches[finalKey] && matches[finalKey].winner ? matches[finalKey].winner : null;
+    const upd = {matches};
+    if (champ) {
+      upd.phase = 'ferdig';
+      upd.champ = champ;
+      const t = (T.teams || {})[champ];
+      if (t) {
+        this.rset('players/' + t.a + '/crown', true);
+        this.rset('players/' + t.b + '/crown', true);
+        const nm = id => (room.players && room.players[id] ? room.players[id].name : '?');
+        this.shout('👑 ' + nm(t.a).toUpperCase() + ' & ' + nm(t.b).toUpperCase() + ' VANT BEERPONG!');
+      }
+    }
+    this.rupd('pong', upd);
+  }
   renderVals() {
     const s = this.state, room = s.room || {};
     const Y = '#F5D40A', K = '#111', W = '#FBF7EC', RED = '#E33B2E';
@@ -660,7 +844,7 @@ class Component extends DCLogic {
     const tasks = this.arr(room.tasks);
     const players = Object.keys(room.players || {}).map(id => {
       const p = room.players[id];
-      return {id, name: p.name, emoji: p.emoji, img: p.img || null, pts: p.pts || 0, benched: !!p.benched, joined: p.joined || 0, you: id === this.pid};
+      return {id, name: p.name, emoji: p.emoji, img: p.img || null, pts: p.pts || 0, benched: !!p.benched, crown: !!p.crown, joined: p.joined || 0, you: id === this.pid};
     }).sort((a, b) => a.joined - b.joined);
     const active = players.filter(p => !p.benched);
     const others = active.filter(p => !p.you);
@@ -672,6 +856,21 @@ class Component extends DCLogic {
     const myPick = quiz[this.pid];
     const ruleRounds = R.slice(0, roundIdx + 1).filter(x => x.type === 'regel');
     const myTaskIdx = tasks.findIndex(t => t && t.who === this.pid && t.state === 'sent');
+    const pickedId = ((room.picks || {})[roundIdx]) || null;
+    const pickedP = pickedId && room.players ? room.players[pickedId] : null;
+    const pickedName = pickedP ? pickedP.name : null;
+    // ---- turnering ----
+    const T = room.pong || {};
+    const tTeams = T.teams || {};
+    const tMatches = T.matches || {};
+    const nameOf = id => (room.players && room.players[id] ? room.players[id].name : '?');
+    const teamName = tid => tid ? (tTeams[tid] ? nameOf(tTeams[tid].a) + ' & ' + nameOf(tTeams[tid].b) : '?') : null;
+    const myTeamId = Object.keys(tTeams).find(k => tTeams[k].a === this.pid || tTeams[k].b === this.pid) || null;
+    const taken = {};
+    Object.keys(tTeams).forEach(k => { taken[tTeams[k].a] = 1; taken[tTeams[k].b] = 1; });
+    const invites = T.invites || {};
+    const incoming = Object.keys(invites).filter(f => invites[f] === this.pid && !taken[f] && !taken[this.pid]);
+    const stagesN = T.stages || 0;
     const takeSelfie = e => {
       const f = e.target && e.target.files && e.target.files[0];
       if (!f) return;
@@ -719,7 +918,7 @@ class Component extends DCLogic {
       poengBg: s.tab === 'poeng' ? Y : 'transparent', poengFg: s.tab === 'poeng' ? K : Y,
       hasStarted: !!room.started, notStarted: !room.started,
       roundLabel: room.started ? 'RUNDE ' + (roundIdx + 1) + '/' + Math.max(R.length, 1) : 'IKKE STARTA',
-      startNight: () => { this.rupd('', {started: true, roundIdx: 0}); this.setState({adminOpen: false, tab: 'kveld'}); this.shout('KVELDEN ER I GANG 🚀'); },
+      startNight: () => { this.rupd('', {started: true, roundIdx: 0}); this.pickRandom(0, players); this.setState({adminOpen: false, tab: 'kveld'}); this.shout('KVELDEN ER I GANG 🚀'); },
       infoOpen: s.infoOpen, infoClosed: !s.infoOpen,
       roundInfo: r.info || 'Ingen ekstra regler — bare gjør som det står.',
       toggleInfo: () => this.setState({infoOpen: !s.infoOpen}),
@@ -741,7 +940,7 @@ class Component extends DCLogic {
       isPekelek: r.type === 'pekelek', isQuiz: r.type === 'quiz', isDuell: r.type === 'duell',
       duelA: (others[0] || {name: '?'}).name, duelB: (others.length > 1 ? others[others.length - 1] : {name: '?'}).name,
       voteOpts: active.map(p => ({
-        name: p.name, emoji: p.emoji, img: p.img, hasImg: !!p.img, noImg: !p.img,
+        name: (p.crown ? '👑 ' : '') + p.name, emoji: p.emoji, img: p.img, hasImg: !!p.img, noImg: !p.img,
         tally: voteCount[p.id] ? '×' + voteCount[p.id] : '',
         bg: myVote === p.id ? K : W, fg: myVote === p.id ? Y : K,
         pick: () => {
@@ -759,6 +958,7 @@ class Component extends DCLogic {
         }
         return {label: o, bg, fg, pick: () => {
           if (myPick != null) return;
+          if (pickedId && pickedId !== this.pid) { this.showToast('DET ER ' + (pickedName || '').toUpperCase() + ' SIN TUR 🎯'); return; }
           this.rset('quiz/' + roundIdx + '/' + this.pid, i);
           if (i === r.right) { this.bump(this.pid, 20); this.showToast('RIKTIG! DEL UT 3 SLURKER 😈'); }
           else this.showToast('FEIL. DRIKK 3 SELV 🥴');
@@ -766,7 +966,7 @@ class Component extends DCLogic {
       }),
       board: [...players].sort((a, b) => b.pts - a.pts).map((p, i) => ({
         rank: '#' + (i + 1),
-        name: (p.you ? p.name + ' (deg)' : p.name) + (p.benched ? ' · BENKA 🪑' : ''),
+        name: (p.crown ? '👑 ' : '') + (p.you ? p.name + ' (deg)' : p.name) + (p.benched ? ' · BENKA 🪑' : ''),
         emoji: p.emoji, img: p.img, hasImg: !!p.img, noImg: !p.img, pts: p.pts,
         bg: p.you ? K : W, fg: p.you ? Y : K, rowOp: p.benched ? 0.45 : 1
       })),
@@ -785,6 +985,7 @@ class Component extends DCLogic {
       nextRound: () => {
         const idx = (roundIdx + 1) % Math.max(R.length, 1);
         this.rset('roundIdx', idx);
+        this.pickRandom(idx, players);
         this.shout('RUNDE ' + (idx + 1) + ' I GANG →');
       },
       interval: room.interval || 15,
@@ -792,7 +993,7 @@ class Component extends DCLogic {
       adminRounds: R.map((x, i) => ({
         n: (i + 1 < 10 ? '0' : '') + (i + 1), title: x.title, badge: (x.type || '').toUpperCase(),
         bg: i === roundIdx ? Y : 'transparent', fg: i === roundIdx ? K : Y,
-        jump: () => { this.rset('roundIdx', i); this.setState({adminOpen: false}); this.shout('HOPPET TIL RUNDE ' + (i + 1)); },
+        jump: () => { this.rset('roundIdx', i); this.pickRandom(i, players); this.setState({adminOpen: false}); this.shout('HOPPET TIL RUNDE ' + (i + 1)); },
         editIt: () => this.setState({editIdx: i, edit: {type: x.type, title: x.title, body: x.body, info: x.info || '', opts: this.arr(x.opts).concat(['', '', '', '']).slice(0, 4), right: x.right ?? 0}})
       })),
       notEditing: s.edit == null, isEditing: s.edit != null,
@@ -865,9 +1066,11 @@ class Component extends DCLogic {
       },
       cancelTask: () => this.setState({taskEditIdx: null, taskText: ''}),
       adminFolk: players.map(p => ({
-        name: p.you ? p.name + ' (deg)' : p.name, emoji: p.emoji, img: p.img,
+        name: (p.crown ? '👑 ' : '') + (p.you ? p.name + ' (deg)' : p.name), emoji: p.emoji, img: p.img,
         hasImg: !!p.img, noImg: !p.img, pts: p.pts, rowOp: p.benched ? 0.5 : 1,
         benchLabel: p.benched ? 'INN 🎉' : 'BENK 🪑',
+        hasCrown: !!p.crown,
+        dropCrown: () => { window.VDB.remove(this.rref('players/' + p.id + '/crown')); this.shout(p.name.toUpperCase() + ' MISTET KRONA 👑💥'); },
         sip: () => { this.bump(p.id, -5); this.shout(p.name.toUpperCase() + ' MÅ DRIKKE 3 🍻'); },
         bench: () => {
           this.rset('players/' + p.id + '/benched', !p.benched);
@@ -878,6 +1081,63 @@ class Component extends DCLogic {
       secretOpen: myTaskIdx >= 0, secretTask: myTaskIdx >= 0 ? tasks[myTaskIdx].t : '',
       secretOk: () => { this.rupd('tasks/' + myTaskIdx, {state: 'done'}); this.bump(this.pid, 30); this.shout('EN HEMMELIG OPPGAVE BLE FULLFØRT — 6 SLURKER DELES UT 😈'); },
       secretFail: () => { this.rupd('tasks/' + myTaskIdx, {state: 'failed'}); this.shout('EN AGENT BLE AVSLØRT — DRIKK 6 🥴'); },
+      // ---- tydelig rundestart ----
+      introOpen: !!room.started && s.introSeen !== roundIdx,
+      closeIntro: () => this.setState({introSeen: roundIdx}),
+      introStage: 'RUNDE ' + (roundIdx + 1) + ' AV ' + Math.max(R.length, 1),
+      hasPicked: !!pickedName, noPicked: !pickedName,
+      pickedName: pickedName || '',
+      pickedLabel: pickedId === this.pid ? 'DU ER UTVALGT 🎯' : 'PÅ TUR: ' + (pickedName || '').toUpperCase(),
+      rerollPick: () => { this.pickRandom(roundIdx, players); this.shout('NY SPILLER TRUKKET UT 🎲'); },
+      // ---- turnering ----
+      isPong: s.tab === 'pong',
+      goPong: () => this.setState({tab: 'pong'}),
+      pongBg: s.tab === 'pong' ? Y : 'transparent', pongFg: s.tab === 'pong' ? K : Y,
+      pongIdle: !T.phase,
+      pongPairing: T.phase === 'lag',
+      pongRunning: T.phase === 'kamp' || T.phase === 'ferdig',
+      hasTeam: !!myTeamId, noTeam: !myTeamId,
+      myTeamName: teamName(myTeamId),
+      hasInvite: incoming.length > 0,
+      inviteFrom: incoming.length ? nameOf(incoming[0]) : '',
+      acceptInvite: () => {
+        const from = incoming[0]; if (!from) return;
+        const tid = from + '-' + this.pid;
+        this.rupd('pong/teams/' + tid, {a: from, b: this.pid});
+        window.VDB.remove(this.rref('pong/invites/' + from));
+        this.shout(nameOf(from).toUpperCase() + ' OG ' + nameOf(this.pid).toUpperCase() + ' ER ET LAG 🏓');
+      },
+      declineInvite: () => { const from = incoming[0]; if (from) window.VDB.remove(this.rref('pong/invites/' + from)); this.showToast('DU SA NEI 🙅'); },
+      myInviteSent: invites[this.pid] ? nameOf(invites[this.pid]) : '',
+      hasSentInvite: !!invites[this.pid],
+      cancelInvite: () => window.VDB.remove(this.rref('pong/invites/' + this.pid)),
+      freeMates: players.filter(p => !p.you && !taken[p.id] && !p.benched).map(p => ({
+        name: p.name, emoji: p.emoji, img: p.img, hasImg: !!p.img, noImg: !p.img,
+        ask: () => { this.rset('pong/invites/' + this.pid, p.id); this.showToast('SPURTE ' + p.name.toUpperCase() + ' 🏓'); }
+      })),
+      pongTeams: Object.keys(tTeams).map(tid => ({name: teamName(tid)})),
+      teamCount: Object.keys(tTeams).length + ' LAG KLARE',
+      canStartPong: Object.keys(tTeams).length >= 2,
+      newPong: () => { this.rset('pong', {phase: 'lag'}); this.setState({adminOpen: false, tab: 'pong'}); this.shout('BEERPONG-TURNERING! FINN DEG EN MAKKER 🏓'); },
+      startPong: () => {
+        const ids = Object.keys(tTeams);
+        if (ids.length < 2) { this.showToast('TRENGER MINST 2 LAG 🏓'); return; }
+        const {matches, stages} = this.buildBracket(ids);
+        this.rupd('pong', {phase: 'kamp', matches, stages, champ: null});
+        this.setState({adminOpen: false, tab: 'pong'});
+        this.shout('TURNERINGEN ER I GANG 🏓');
+      },
+      resetPong: () => { window.VDB.remove(this.rref('pong')); this.shout('TURNERINGEN ER NULLSTILT'); },
+      bracket: Object.keys(tMatches).sort().map(k => tMatches[k]).sort((a, b) => a.stage - b.stage || a.slot - b.slot).map(m => ({
+        stage: this.stageName(m.stage, stagesN),
+        showStage: m.slot === 0,
+        t1: teamName(m.t1) || '— venter —', t2: teamName(m.t2) || '— venter —',
+        t1Bg: m.winner && m.winner === m.t1 ? Y : 'transparent', t1Fg: m.winner && m.winner === m.t1 ? K : Y,
+        t2Bg: m.winner && m.winner === m.t2 ? Y : 'transparent', t2Fg: m.winner && m.winner === m.t2 ? K : Y,
+        canPick: s.isAdmin && !!m.t1 && !!m.t2 && !m.winner,
+        win1: () => this.setPongWinner(m, m.t1), win2: () => this.setPongWinner(m, m.t2)
+      })),
+      hasChamp: !!T.champ, champName: T.champ ? teamName(T.champ) : '',
       toastMsg: s.toast
     };
   }
