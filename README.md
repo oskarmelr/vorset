@@ -32,10 +32,8 @@ Bak 🔒-knappen, PIN `7067`. Admin kan:
 - `*.png` + `manifest.json` — PWA-oppsett for hjemskjerm
 - `vorset-standalone-prototype.html` — original prototype (referanse)
 
-## Viktig: sikkerhetsreglene utløper 28. august 2026
-Databasen kjører foreløpig på Firebase sine **test-modus-regler**, som slutter å virke automatisk 28.08.2026. Da vil appen ikke lenger kunne koble til.
-
-Fiks før den datoen: åpne [reglene](https://console.firebase.google.com/project/vorset-9010e/database/vorset-9010e-default-rtdb/rules), bytt ut alt med dette og trykk **Publish**:
+## Sikkerhet
+Databasereglene er permanente (ingen utløpsdato) og avgrenset til ett rom om gangen:
 
 ```json
 {
@@ -50,4 +48,4 @@ Fiks før den datoen: åpne [reglene](https://console.firebase.google.com/projec
 }
 ```
 
-Merk at dette (som test-modus) lar hvem som helst med romkoden lese og skrive i det rommet. Data er kun kallenavn, emoji, selfie og poeng — ikke legg inn noe sensitivt.
+Det betyr at ingen kan liste opp alle rom eller røre noe annet i databasen. Alle som kjenner en romkode kan derimot lese og skrive i akkurat det rommet — innholdet er kun kallenavn, emoji, selfie og poeng, så ikke legg inn noe sensitivt.
